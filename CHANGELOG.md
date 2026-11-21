@@ -14,7 +14,7 @@
 
 ## [5.2.57] - 修复 Vercel 部署审计发现的全部代码/配置问题
 ### Fixed
-- **Sentry 构建路径实测失败**：`next.config.mjs` 从 `@sentry/nextjs` 根导入 `withSentryConfig`，但 v11 已将该导出移至 `@sentry/nextjs/config`；平台一旦设置 `SENTRY_DSN` 即报 `withSentryConfig is not a function`。已改为从 `/config` 具名导入，并用带 DSN 的独立构建实测通过。
+- **Sentry 构建路径实测失败**：`next.config.mjs` 从 `@sentry/nextjs` 根导入 `withSentryConfig`，但 v11 已将该导出移至 `@sentry/nextjs/config`；平台一旦设置 `SENTRY_DSN` 即报 `withSentryConfig is not a function`。已改为从 `/config` 具名导入（Node 直接导入验证函数可用），并加静态回归单测；完整带 DSN 构建仍需平台 Preview 验证。
 - **proxy 拦截社交分享图**：`/opengraph-image` / `/twitter-image` / `icon` / `manifest` / `favicon` 被语言协商 302。新增 `src/lib/proxy-matcher.ts` 统一绕过规则（matcher 静态字面量 + 运行时守卫），并加单测锁定两处同步。
 - **Next 16 matcher 静态约束**：`config.matcher` 不能引用导入常量，首次修复曾导致构建失败，已改为字面量并保留同步校验。
 - **备份上限超平台限制**：`MAX_BACKUP_BYTES` 5 MB → 4 MB，避免 Vercel Serverless 4.5 MB 请求体上限提前返回 413。
