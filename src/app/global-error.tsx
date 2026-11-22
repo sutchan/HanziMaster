@@ -1,9 +1,9 @@
-// src/app/global-error.tsx v5.2.45
+// src/app/global-error.tsx v5.2.58
 'use client';
 
 import { useEffect, useState } from 'react';
 import { captureException } from '@sentry/nextjs';
-import { isRtlLocale, isSupportedLocale } from '@/lib/site';
+import { DEFAULT_LOCALE, isRtlLocale, isSupportedLocale, type SupportedLocale } from '@/lib/site';
 
 /** 根级错误边界：必须自带 html/body，且不依赖任何 Provider。 */
 export default function GlobalError({
@@ -13,16 +13,18 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  // 根错误边界不套 Provider：从 proxy 写入的 locale cookie 恢复语言与方向，避免 RTL 用户看到 LTR 错误页
-  const [locale, setLocale] = useState('zh-CN');
+  // 根错误边界不套 Provider：初始值与全站默认语言一致，再由 html lang / cookie 恢复，避免 RTL 用户看到 LTR 错误页
+  const [locale, setLocale] = useState<SupportedLocale>(DEFAULT_LOCALE);
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
       captureException(error);
     }
     try {
+      const fromDocument = document.documentElement.lang;
       const raw = document.cookie.match(/(?:^|;\s*)hanzi-master-locale=([^;]+)/)?.[1];
-      const value = raw ? decodeURIComponent(raw) : '';
-      if (isSupportedLocale(value)) setLocale(value);
+      const fromCookie = raw ? decodeURIComponent(raw) : '';
+      if (isSupportedLocale(fromDocument)) setLocale(fromDocument);
+      else if (isSupportedLocale(fromCookie)) setLocale(fromCookie);
     } catch {
       // cookie 值畸形时保留默认语言
     }

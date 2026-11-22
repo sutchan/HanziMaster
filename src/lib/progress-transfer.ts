@@ -1,7 +1,11 @@
-// src/lib/progress-transfer.ts v5.2.57
+// src/lib/progress-transfer.ts v5.2.58
 // P2-17：学习进度 JSON 备份（导出 / 导入 / 严格校验 / v0 迁移），纯函数不触碰 localStorage。
 
 import { getDefaultProgress, validateProgress, type ProgressData } from './progress-utils';
+import { MAX_BACKUP_BYTES } from './cloud-sync';
+
+// 上限唯一来源为 cloud-sync.ts，保持客户端导出 / 导入 / API 路由三处口径一致
+export { MAX_BACKUP_BYTES };
 
 export interface ProgressBackup {
   app: 'HanziMaster';
@@ -10,9 +14,6 @@ export interface ProgressBackup {
   progress: ProgressData;
 }
 
-// 4 MB：低于 Vercel Serverless 4.5 MB 请求体上限，与 cloud-sync.ts 保持一致
-const MAX_BACKUP_BYTES = 4 * 1024 * 1024;
-
 export function createProgressBackup(progress: ProgressData, exportedAt = new Date()): string {
   const backup: ProgressBackup = {
     app: 'HanziMaster',
@@ -20,7 +21,8 @@ export function createProgressBackup(progress: ProgressData, exportedAt = new Da
     exportedAt: exportedAt.toISOString(),
     progress: validateProgress(progress),
   };
-  return JSON.stringify(backup, null, 2);
+  // 紧凑序列化：pretty-print 会把 quizResults 放大约 2 倍，可能造成「写入成功、读回 413」
+  return JSON.stringify(backup);
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -28,7 +30,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 /** 解析备份：非法 JSON / 错误应用 / 字段类型错误一律抛错，导入方不得写坏现有进度。 */
 export function parseProgressBackup(raw: string): ProgressData {
-  if (typeof raw !== 'string' || new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) {
+  // UTF-16 码元数不超过 UTF-8 字节数，先做 O(1) 快速拒绝，避免超大输入触发全量编码分配
+  if (typeof raw !== 'string' || raw.length > MAX_BACKUP_BYTES) {
+    throw new Error('备份文件过大或格式错误');
+  }
+  if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) {
     throw new Error('备份文件过大或格式错误');
   }
 

@@ -25,6 +25,10 @@ export async function GET(request: NextRequest) {
   try {
     const file = await get(blobPath(code), { access: 'private' });
     if (!file) return reject('not_found', 404, 'No cloud progress for this code');
+    // 先按 blob 元数据拒绝超大对象，避免把整个远端内容读进内存后才返回 413
+    if (typeof file.size === 'number' && file.size > MAX_BACKUP_BYTES) {
+      return reject('too_large', 413, 'Cloud backup exceeds size limit');
+    }
     const raw = await new Response(file.stream).text();
     if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) {
       return reject('too_large', 413, 'Cloud backup exceeds size limit');
@@ -58,7 +62,12 @@ export async function PUT(request: NextRequest) {
   try {
     const progress = parseProgressBackup(body.backup);
     if (isEmpty(progress)) return reject('empty_progress', 400, 'Refusing to overwrite cloud progress with empty data');
-    await put(blobPath(body.code), createProgressBackup(progress), {
+    const serialized = createProgressBackup(progress);
+    // 校验最终要持久化的字符串，避免写进去的 blob 超过 GET 上限而永久读不回来
+    if (new TextEncoder().encode(serialized).length > MAX_BACKUP_BYTES) {
+      return reject('too_large', 413, 'Backup exceeds size limit');
+    }
+    await put(blobPath(body.code), serialized, {
       access: 'private',
       contentType: 'application/json',
       allowOverwrite: true,

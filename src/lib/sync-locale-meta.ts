@@ -1,4 +1,4 @@
-// src/lib/sync-locale-meta.ts v5.2.57
+// src/lib/sync-locale-meta.ts v5.2.58
 // 客户端切语言时同步 head 元数据与 JSON-LD：URL 前缀路由不重跑 RSC generateMetadata，需手动对齐。
 import { isSupportedLocale, OG_LOCALES, type SupportedLocale } from './site';
 import { clientMetadataPatch } from './seo-page';
@@ -39,6 +39,8 @@ export const syncMetadataLocale = (value: SupportedLocale): void => {
 
   document.title = patch.title;
   setMeta('meta[name="description"]', patch.description);
+  // buildMetadata 也生成 og:url；客户端切语言不重跑 RSC，须与 canonical 一起同步
+  setMeta('meta[property="og:url"]', href ? withLocale(href, value) : window.location.href);
   setMeta('meta[property="og:locale"]', OG_LOCALES[value]);
   setMeta('meta[property="og:title"]', patch.ogTitle);
   setMeta('meta[property="og:description"]', patch.ogDescription);

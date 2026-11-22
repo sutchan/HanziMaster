@@ -1,7 +1,7 @@
-// src/hooks/use-pronunciation.ts v5.2.38
+// src/hooks/use-pronunciation.ts v5.2.58
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // 汉字发音 Hook，基于 Web Speech API。
 // 统一处理 isSpeaking 状态、不支持时的错误反馈，以及组件卸载时中断发音。
