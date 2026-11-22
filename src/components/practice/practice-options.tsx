@@ -1,4 +1,4 @@
-// src/components/practice/practice-options.tsx v5.2.57
+// src/components/practice/practice-options.tsx v5.2.58
 'use client';
 
 import { useTranslation } from '@/components/locale-provider';
@@ -24,23 +24,23 @@ export function PracticeOptionsGrid({ selectedOption, onSelect }: PracticeOption
               isSelected ? 'border-vermilion-500 shadow-vermilion-glow' : ''
             }`}
           >
-            <div className={`relative w-20 h-20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ${
+            <span className={`relative w-20 h-20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ${
               isSelected ? 'bg-vermilion-500 text-primary-foreground' : 'bg-linear-to-br from-vermilion-500/10 to-indigo/10 dark:from-vermilion-500/20 dark:to-indigo/20 text-vermilion-500'
             }`}>
               {icons[option.icon]}
-            </div>
-            <h2 className="text-xl font-semibold mb-3 text-ink-900 dark:text-ink-50 display-font">
+            </span>
+            <span role="heading" aria-level={2} className="block text-xl font-semibold mb-3 text-ink-900 dark:text-ink-50 display-font">
               {t(option.titleKey)}
-            </h2>
-            <p className="text-base text-ink-600 dark:text-ink-300 leading-relaxed mb-6">
+            </span>
+            <span className="block text-base text-ink-600 dark:text-ink-300 leading-relaxed mb-6">
               {t(option.descKey)}
-            </p>
-            <div className={`flex items-center gap-2 font-semibold ${isSelected ? 'text-primary-foreground' : 'text-vermilion-500'} group`}>
+            </span>
+            <span className={`flex items-center gap-2 font-semibold ${isSelected ? 'text-primary-foreground' : 'text-vermilion-500'} group`}>
               <span>{t('practice.startNow')}</span>
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l-4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </div>
+            </span>
           </button>
         );
       })}

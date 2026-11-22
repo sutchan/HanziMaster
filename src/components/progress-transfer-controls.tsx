@@ -1,4 +1,4 @@
-// src/components/progress-transfer-controls.tsx v5.2.50
+// src/components/progress-transfer-controls.tsx v5.2.58
 // P2-17：设置面板中的进度导出 / 导入入口。
 'use client';
 
@@ -8,7 +8,7 @@ import { useToast } from '@/components/toast';
 import { Button } from '@/components/ui/button';
 import { safeGetItem, trySetItem } from '@/lib/storage';
 import { getDefaultProgress, type ProgressData } from '@/lib/progress-utils';
-import { createProgressBackup, parseProgressBackup } from '@/lib/progress-transfer';
+import { createProgressBackup, MAX_BACKUP_BYTES, parseProgressBackup } from '@/lib/progress-transfer';
 import { PROGRESS_STORAGE_KEY, PROGRESS_IMPORTED_EVENT } from '@/hooks/use-progress';
 
 export function ProgressTransferControls() {
@@ -18,7 +18,13 @@ export function ProgressTransferControls() {
 
   const handleExport = () => {
     const progress = safeGetItem<ProgressData>(PROGRESS_STORAGE_KEY, getDefaultProgress());
-    const url = URL.createObjectURL(new Blob([createProgressBackup(progress)], { type: 'application/json' }));
+    const backup = createProgressBackup(progress);
+    // 与导入器/云同步使用同一上限，避免导出一个自己无法导回的文件
+    if (new TextEncoder().encode(backup).length > MAX_BACKUP_BYTES) {
+      toast.error(t('common.errorDesc'));
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([backup], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = url;
     link.download = `hanzi-master-progress-${new Date().toISOString().slice(0, 10)}.json`;

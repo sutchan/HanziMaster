@@ -1,7 +1,7 @@
-// src/lib/__tests__/progress-transfer.test.ts v5.2.44
+// src/lib/__tests__/progress-transfer.test.ts v5.2.58
 
 import { describe, expect, it } from 'vitest';
-import { createProgressBackup, parseProgressBackup } from '../progress-transfer';
+import { createProgressBackup, MAX_BACKUP_BYTES, parseProgressBackup } from '../progress-transfer';
 import type { ProgressData } from '../progress-utils';
 
 const sample: ProgressData = {
@@ -32,5 +32,15 @@ describe('进度备份', () => {
     const parsed = parseProgressBackup(legacy);
     expect(parsed.learnedCharIds).toEqual([1, 2]);
     expect(parsed.quizResults).toEqual([]);
+  });
+
+  it('紧凑序列化且不写出行数上限，避免写入后读回 413', () => {
+    const raw = createProgressBackup(sample);
+    expect(raw).not.toContain('\n');
+    expect(new TextEncoder().encode(raw).length).toBeLessThan(MAX_BACKUP_BYTES);
+  });
+
+  it('超大输入在编码前快速拒绝', () => {
+    expect(() => parseProgressBackup('x'.repeat(MAX_BACKUP_BYTES + 1))).toThrow(/过大/);
   });
 });

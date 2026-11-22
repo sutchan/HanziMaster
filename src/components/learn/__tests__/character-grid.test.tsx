@@ -1,4 +1,4 @@
-// src/components/learn/__tests__/character-grid.test.tsx v5.2.31
+// src/components/learn/__tests__/character-grid.test.tsx v5.2.58
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
@@ -14,14 +14,14 @@ const renderGrid = (onSelect: (id: number) => void) =>
   );
 
 describe('CharacterGrid', () => {
-  it('should render all characters as selectable options', () => {
+  it('should render all characters as native buttons', () => {
     renderGrid(vi.fn());
-    expect(screen.getAllByRole('option')).toHaveLength(characters.length);
+    expect(screen.getAllByRole('button')).toHaveLength(characters.length);
   });
 
-  it('should mark the selected option with aria-selected', () => {
+  it('should mark the selected character with aria-pressed', () => {
     renderGrid(vi.fn());
-    expect(screen.getByRole('option', { selected: true })).toHaveAccessibleName(
+    expect(screen.getByRole('button', { pressed: true })).toHaveAccessibleName(
       `${characters[0].hanzi}, ${characters[0].pinyin}`
     );
   });
@@ -30,7 +30,7 @@ describe('CharacterGrid', () => {
     const onSelect = vi.fn();
     renderGrid(onSelect);
     const target = characters[1];
-    fireEvent.click(screen.getByRole('option', { name: `${target.hanzi}, ${target.pinyin}` }));
+    fireEvent.click(screen.getByRole('button', { name: `${target.hanzi}, ${target.pinyin}` }));
     expect(onSelect).toHaveBeenCalledWith(target.id);
   });
 });

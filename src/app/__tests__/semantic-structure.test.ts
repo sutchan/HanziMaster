@@ -1,4 +1,4 @@
-// src/app/__tests__/semantic-structure.test.ts v5.2.57
+// src/app/__tests__/semantic-structure.test.ts v5.2.58
 // 语义结构静态门禁：页面标题层级与地标数量直接影响 SEO / a11y，且不依赖本地字体网络。
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -27,7 +27,8 @@ describe('semantic heading structure', () => {
     ]) {
       const text = source(file);
       expect(count(text, /<h3[\s>]/g)).toBe(0);
-      expect(count(text, /<h2[\s>]/g)).toBeGreaterThan(0);
+      // button 内不允许 flow content；practice-options 用 span role=heading aria-level=2 表达等价的二级标题
+      expect(count(text, /<h2[\s>]/g) + count(text, /role="heading"\s+aria-level=\{2\}/g)).toBeGreaterThan(0);
     }
   });
 

@@ -1,4 +1,4 @@
-// src/components/learn/character-grid.tsx v5.2.47
+// src/components/learn/character-grid.tsx v5.2.58
 // 选字格改为素纸小格 + 朱砂印角，去掉整格红底与脉冲装饰。
 'use client';
 
@@ -16,7 +16,6 @@ export function CharacterGrid({ selectedId, onSelect }: CharacterGridProps) {
   return (
     <div
       id="character-grid"
-      role="listbox"
       aria-label={t('common.masterCharacters')}
       className="stagger-children reveal mb-8 grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6"
     >
@@ -25,9 +24,9 @@ export function CharacterGrid({ selectedId, onSelect }: CharacterGridProps) {
         return (
           <button
             key={character.id}
+            type="button"
             onClick={() => onSelect(character.id)}
-            role="option"
-            aria-selected={isSelected}
+            aria-pressed={isSelected}
             aria-label={`${character.hanzi}, ${character.pinyin}`}
             className={`group relative flex aspect-square flex-col items-center justify-center border transition-colors duration-200 ${
               isSelected

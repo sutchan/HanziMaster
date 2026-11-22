@@ -1,4 +1,4 @@
-// src/components/__tests__/settings-dialog.test.tsx v5.2.44
+// src/components/__tests__/settings-dialog.test.tsx v5.2.58
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -44,6 +44,7 @@ afterEach(() => {
   document.documentElement.classList.remove('reduce-motion');
 });
 
+// 全量并行运行时本机 I/O 开销大，5s 默认超时会假失败；本文件统一放宽到 20s（单文件跑仍毫秒级）
 describe('settings dialog', () => {
   it('persists the haptics toggle', async () => {
     const user = userEvent.setup();
@@ -116,4 +117,4 @@ describe('settings dialog', () => {
     await user.click(screen.getByRole('button', { name: 'Accept' }));
     expect(getConsent()).toBe('granted');
   });
-});
+}, 20000);

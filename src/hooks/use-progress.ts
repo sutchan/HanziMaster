@@ -1,8 +1,9 @@
-// src/hooks/use-progress.ts v5.2.50
+// src/hooks/use-progress.ts v5.2.58
 // Progress tracking with localStorage persistence
 
 import { useState, useEffect, useCallback } from 'react';
-import { safeGetItem, safeRemoveItem, safeSetItem } from '@/lib/storage';
+import { safeGetItem, safeRemoveItem, trySetItem } from '@/lib/storage';
+import { logger } from '@/lib/logger';
 import {
   type ProgressData,
   computeAccuracy,
@@ -29,6 +30,7 @@ export function useProgress() {
   // SSR 与客户端首帧统一用默认进度；挂载后再读 localStorage，避免 hydration 不一致
   const [progress, setProgress] = useState<ProgressData>(getDefaultProgress);
   const [loaded, setLoaded] = useState(false);
+  const [persistError, setPersistError] = useState(false);
 
   useEffect(() => {
     setProgress(readProgress());
@@ -45,9 +47,13 @@ export function useProgress() {
       Object.keys(progress.dailyActivity).length === 0;
     if (isEmpty) {
       safeRemoveItem(PROGRESS_STORAGE_KEY);
+      setPersistError(false);
       return;
     }
-    safeSetItem(PROGRESS_STORAGE_KEY, progress);
+    // 配额超限 / 隐私模式下写入会失败：记录并暴露状态，避免 UI 显示「已保存」的假象
+    const ok = trySetItem(PROGRESS_STORAGE_KEY, progress);
+    setPersistError(!ok);
+    if (!ok) logger.error('学习进度写入 localStorage 失败', { key: PROGRESS_STORAGE_KEY });
   }, [progress, loaded]);
 
   useEffect(() => {
@@ -114,6 +120,7 @@ export function useProgress() {
     getDailyStreak,
     getWeeklyActivity,
     markTodayActive,
+    persistError,
     streak: getDailyStreak(),
     accuracy: getAccuracy(),
   };

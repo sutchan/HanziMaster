@@ -1,4 +1,4 @@
-// src/app/api/progress/route.ts v5.2.51
+// src/app/api/progress/route.ts v5.2.58
 // Vercel Blob 进度同步端点：私有 store，同步码即能力凭证；未配置 token 时 503 降级。
 import { NextResponse, type NextRequest } from 'next/server';
 import { get, put } from '@vercel/blob';
@@ -25,8 +25,9 @@ export async function GET(request: NextRequest) {
   try {
     const file = await get(blobPath(code), { access: 'private' });
     if (!file) return reject('not_found', 404, 'No cloud progress for this code');
-    // 先按 blob 元数据拒绝超大对象，避免把整个远端内容读进内存后才返回 413
-    if (typeof file.size === 'number' && file.size > MAX_BACKUP_BYTES) {
+    // 先按响应头拒绝超大对象，避免把整个远端内容读进内存后才返回 413；头缺失时退化为读取后的体积校验
+    const contentLength = Number(file.headers.get('content-length') ?? 0);
+    if (contentLength > MAX_BACKUP_BYTES) {
       return reject('too_large', 413, 'Cloud backup exceeds size limit');
     }
     const raw = await new Response(file.stream).text();

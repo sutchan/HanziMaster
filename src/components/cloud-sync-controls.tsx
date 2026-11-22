@@ -1,4 +1,4 @@
-// src/components/cloud-sync-controls.tsx v5.2.51
+// src/components/cloud-sync-controls.tsx v5.2.58
 // 云同步入口：同步码生成/复制、上传与恢复；localStorage 仍是主存储，云端失败不影响本地进度。
 'use client';
 
@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useLocale } from '@/components/locale-provider';
 import { useToast } from '@/components/toast';
 import { Button } from '@/components/ui/button';
-import { safeGetItem, safeSetItem, trySetItem } from '@/lib/storage';
+import { safeGetItem, trySetItem } from '@/lib/storage';
 import { getDefaultProgress, type ProgressData } from '@/lib/progress-utils';
 import { createProgressBackup, parseProgressBackup } from '@/lib/progress-transfer';
 import { PROGRESS_STORAGE_KEY, PROGRESS_IMPORTED_EVENT } from '@/hooks/use-progress';
@@ -30,7 +30,10 @@ export function CloudSyncControls() {
 
   const saveCode = (next: string) => {
     setCode(next);
-    safeSetItem(SYNC_CODE_STORAGE_KEY, next);
+    // 同步码丢失会导致云端数据失去访问入口，写入失败必须提示
+    if (!trySetItem(SYNC_CODE_STORAGE_KEY, next)) {
+      toast.error(t('common.errorDesc'));
+    }
   };
 
   const handleGenerate = () => {

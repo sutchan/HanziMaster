@@ -1,7 +1,7 @@
-// src/components/pages/learn-page.tsx v5.2.57
+// src/components/pages/learn-page.tsx v5.2.58
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocale } from '@/components/locale-provider';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
@@ -64,11 +64,11 @@ export default function LearnPage() {
   // 组件卸载时清理定时器
   useEffect(() => clearAutoCloseTimer, []);
 
-  const goCharacter = (delta: number) => {
+  const goCharacter = useCallback((delta: number) => {
     const idx = characters.findIndex((c) => c.id === (selectedCharacterId ?? -1));
     const next = characters[(idx + delta + characters.length) % characters.length];
     setSelectedCharacterId(next.id);
-  };
+  }, [selectedCharacterId]);
 
   const handleNextCharacter = () => goCharacter(1);
 
@@ -84,7 +84,7 @@ export default function LearnPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  });
+  }, [showQuizDialog, goCharacter]);
 
   return (
     <div id="learn-page" className="min-h-screen bg-background">

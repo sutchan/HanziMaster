@@ -1,6 +1,11 @@
 ﻿# Changelog
 
 ## [5.2.58] - 临时文件规范收口：移除历史 .tmp 与最后一处脚本硬编码
+### Fixed（全量代码审查批次）
+- **服务端 / SEO**：根 `error.tsx` 补齐 Sentry 上报（与其余三个错误边界一致）；`global-error.tsx` 初始语言由写死 `zh-CN` 改为 `DEFAULT_LOCALE=en` 并优先读取 `html lang`；`getPageSeo` 与根布局同构读取 locale cookie，避免标题语言与 `html lang` 分叉；`syncMetadataLocale` 客户端切语言同步 `og:url`；进度 API GET 在读取 blob 前按 `content-length` 拒绝超大对象、PUT 写入前校验最终序列化体积；`createProgressBackup` 改紧凑 JSON、解析端 O(1) 快速拒绝，三处共用 `MAX_BACKUP_BYTES`。
+- **组件 / hooks**：修复发音回调竞态（旧 utterance 回调失效、canceled 不算故障）；进度写入失败改 `trySetItem` + `persistError` 暴露并记日志；导出前校验备份体积、同步码写入失败提示；桌面/移动设置按钮使用唯一 id；learn 键盘监听补依赖数组；character-grid 弃用无键盘导航的 listbox 语义改 `aria-pressed`；writing-canvas 消除悬空 `aria-describedby`；practice-options 的 button 内容模型改为合法的短语内容并保留标题语义。
+- **测试**：新增备份紧凑/超大输入、og:url 同步、发音竞态回归用例；settings-dialog 测试组超时放宽至 20s，消除全量并行运行时的 5s 假失败。
+
 ### Changed
 - 根目录清洁度门禁 `scripts/check-root-clean.mjs` 白名单移除历史临时目录 `.tmp/`；四类受管目录 `tmp/`（会话临时）/ `cache/`（可再生缓存）/ `log/`（运行日志）/ `reports/`（正式产物）之外的临时目录不再被放行，规范由门禁强制。
 - `scripts/seo-audit.mjs` 最后一处 `reports/` 路径硬编码改为从 `scripts/temp-paths.mjs` 导入 `REPORTS_DIR` + `ensureDir()`；全部脚本的产物路径现均来自单一来源，无散落硬编码。

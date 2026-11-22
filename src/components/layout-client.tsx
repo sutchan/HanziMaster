@@ -1,4 +1,4 @@
-// src/components/layout-client.tsx v5.2.50
+// src/components/layout-client.tsx v5.2.58
 'use client';
 
 import { VERSION_LABEL } from '@/lib/version';
@@ -67,14 +67,14 @@ export function LayoutClient({ children }: LayoutClientProps) {
               <div className="w-px h-6 bg-ink-200 dark:bg-ink-700"></div>
               <LocaleToggleClient idPrefix="locale-toggle-desktop" />
               <ThemeToggleClient id="theme-toggle-desktop" />
-              <SettingsButton />
+              <SettingsButton id="settings-open-desktop" />
             </nav>
 
             {/* Mobile Controls */}
             <div className="flex items-center gap-2 lg:hidden">
               <ThemeToggleClient id="theme-toggle-mobile" />
               <LocaleToggleClient idPrefix="locale-toggle-mobile" />
-              <SettingsButton />
+              <SettingsButton id="settings-open-mobile" />
               <button
                 onClick={() => setMobileNavOpen(true)}
                 className="p-2 rounded-xl hover:bg-ink-100 dark:hover:bg-ink-800 transition-colors duration-200 touch-target"

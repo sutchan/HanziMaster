@@ -10,6 +10,8 @@ export function usePronunciation() {
   const [pronounceError, setPronounceError] = useState(false);
   // 能力检测：三态（null = 未检测），挂载后检测以避免 SSR/客户端 hydration 不一致（P2-16）
   const [speechSupported, setSpeechSupported] = useState<boolean | null>(null);
+  // 每次发音递增；cancel() 触发的旧 utterance 回调异步到达时据此忽略，避免污染新发音状态
+  const utteranceId = useRef(0);
 
   useEffect(() => {
     setSpeechSupported('speechSynthesis' in window);
@@ -23,14 +25,23 @@ export function usePronunciation() {
     }
     setPronounceError(false);
     try {
+      const id = ++utteranceId.current;
       const utterance = new SpeechSynthesisUtterance(hanzi);
       utterance.lang = 'zh-CN';
       utterance.rate = 0.8;
       utterance.pitch = 1;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => {
+      const isCurrent = () => id === utteranceId.current;
+      utterance.onstart = () => {
+        if (isCurrent()) setIsSpeaking(true);
+      };
+      utterance.onend = () => {
+        if (isCurrent()) setIsSpeaking(false);
+      };
+      utterance.onerror = (event) => {
+        if (!isCurrent()) return;
         setIsSpeaking(false);
+        // 被主动取消/打断属正常流程，不应向用户报发音故障
+        if (event && (event.error === 'canceled' || event.error === 'interrupted')) return;
         setPronounceError(true);
       };
       window.speechSynthesis.cancel();
@@ -45,6 +56,7 @@ export function usePronunciation() {
   // 组件卸载时中断正在播放的发音，避免延续到卸载后
   useEffect(() => {
     return () => {
+      utteranceId.current++;
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }

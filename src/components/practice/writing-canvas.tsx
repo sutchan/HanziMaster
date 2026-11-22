@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas.tsx v5.2.51
+// src/components/practice/writing-canvas.tsx v5.2.58
 // 书写画布：淡字底图 + 指针描线 + 逐笔笔顺引导 + 键盘替代路径；指针交互拆分见 writing-canvas-input.ts。
 'use client';
 
@@ -121,7 +121,7 @@ export const WritingCanvas = forwardRef<WritingCanvasHandle, WritingCanvasProps>
             ref={canvasRef}
             role="img"
             aria-label={`${character} ${t('practice.canvasLabel')}`}
-            aria-describedby="writing-stroke-help"
+            aria-describedby={hasGuidance ? 'writing-stroke-help' : undefined}
             className="h-full w-full cursor-crosshair touch-none"
             onPointerDown={(e) => pointerDown(inputContext(), e)}
             onPointerMove={(e) => pointerMove(inputContext(), e)}

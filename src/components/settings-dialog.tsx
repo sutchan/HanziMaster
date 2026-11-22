@@ -1,4 +1,4 @@
-// src/components/settings-dialog.tsx v5.2.52
+// src/components/settings-dialog.tsx v5.2.58
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -19,7 +19,8 @@ const applyReduceMotion = (on: boolean) => {
   document.documentElement.classList.toggle('reduce-motion', on);
 };
 
-export function SettingsButton() {
+/** 头部桌面/移动各渲染一次，调用方须传不同的 id，避免重复 DOM id。 */
+export function SettingsButton({ id = 'settings-open' }: { id?: string }) {
   const { t, locale, setLocale, availableLocales } = useLocale();
   const { theme, setTheme } = useTheme();
   const toast = useToast();
@@ -49,7 +50,7 @@ export function SettingsButton() {
     <>
       <button
         type="button"
-        id="settings-open"
+        id={id}
         onClick={() => setOpen(true)}
         aria-label={t('settings.title')}
         aria-haspopup="dialog"
