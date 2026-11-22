@@ -1,6 +1,6 @@
 # 测试规范
 
-> 文档版本：v5.2.55（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.58（与项目版本同步，权威版本见 `package.json`）
 
 本文描述项目**当前真实**的测试基础设施与编写规范。质量门禁的定义与完整命令表见 [coding-standards.md](coding-standards.md) §11；未完成的测试改进任务见 [tasks.md](tasks.md)。
 
@@ -42,7 +42,7 @@
 |------|------|
 | `pnpm test` | 运行全部单测（`vitest run`） |
 | `pnpm test:watch` | 监听模式 |
-| `pnpm test:run` | 包装器 `scripts/run-tests.mjs`，产物写 `reports/test-out.txt`，透传 `--coverage` |
+| `pnpm test:run` | 包装器 `scripts/run-tests.mjs`，日志写 `log/test-out.log`，透传 `--coverage` |
 | `pnpm test:run --coverage` | 带覆盖率运行，报告写 `coverage/`（text / json-summary / html） |
 | `pnpm e2e` | Playwright 端到端测试（`e2e/home.spec.ts`、`e2e/a11y.spec.ts`） |
 | `pnpm e2e:ui` | E2E 可视化调试模式 |

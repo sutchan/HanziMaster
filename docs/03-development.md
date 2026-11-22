@@ -1,6 +1,6 @@
 # 开发指南
 
-> 文档版本：v5.2.55（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.58（与项目版本同步，权威版本见 `package.json`）
 
 本文负责**开发环境、命令表与日常流程**。编码风格、命名、目录组织、设计 token、i18n、版本号与质量门禁的唯一权威是 [coding-standards.md](coding-standards.md)；提交、分支与审查见 [git-workflow.md](git-workflow.md)。
 
@@ -103,7 +103,7 @@ package.json version（唯一权威源）
   - `node node_modules/vitest/vitest.mjs run --reporter=dot`
   - `node node_modules/eslint/bin/eslint.js src`
   - `node scripts/check-line-count.mjs`
-- 含 `vitest` 字样的长命令可能被工具误判为 watch 并提前中断，用 `node scripts/run-tests.mjs` 包装并读取 `reports/test-out.txt`。
+- 含 `vitest` 字样的长命令可能被工具误判为 watch 并提前中断，用 `node scripts/run-tests.mjs` 包装并读取 `log/test-out.log`。
 - Node 24 的 `globalThis.localStorage` getter 会遮蔽 jsdom 实现，`vitest.setup.ts` 已安装内存 Storage 兜底；业务代码统一用 `window.localStorage`（见 [06-testing.md](06-testing.md) §1）。
 - 离线环境 `next build` 可能因 `next/font/google` 下载字体失败，见 [05-deployment.md](05-deployment.md) §1。
 - 推送 GitHub 返回 `remote: Internal Server Error` 时，用 `git -c http.version=HTTP/1.1 push origin <branch>` 重试。

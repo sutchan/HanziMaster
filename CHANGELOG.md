@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## [5.2.58] - 临时文件规范收口：移除历史 .tmp 与最后一处脚本硬编码
+### Changed
+- 根目录清洁度门禁 `scripts/check-root-clean.mjs` 白名单移除历史临时目录 `.tmp/`；四类受管目录 `tmp/`（会话临时）/ `cache/`（可再生缓存）/ `log/`（运行日志）/ `reports/`（正式产物）之外的临时目录不再被放行，规范由门禁强制。
+- `scripts/seo-audit.mjs` 最后一处 `reports/` 路径硬编码改为从 `scripts/temp-paths.mjs` 导入 `REPORTS_DIR` + `ensureDir()`；全部脚本的产物路径现均来自单一来源，无散落硬编码。
+- 修正 `docs/06-testing.md` / `docs/03-development.md` 中过时的 `reports/test-out.txt` 描述，统一为实际产物 `log/test-out.log`。
+### Chore
+- 删除历史残留 `.tmp/find-budget-msg.mjs` 及其目录；`reports/` 中 11 个运行日志按规范迁入 `log/`，`reports/` 仅保留正式核验产物。
+- 同步版本展示位与本次改动文件头戳至 v5.2.58（`package.json` / `metadata.json` / `README.md` / `README_EN.md` / CHANGELOG）。
+
 ## [5.2.57] - SEO / GEO 代码层收口与量化验证（与部署审计批次同版本）
 ### Changed
 - **规范文档对齐**：`coding-standards.md` 目录树补 `src/proxy.ts` / `theme-colors.css` / `settings.ts` / `extensions/` 与 `load-translations.ts`，§7 补设置读写约定，§9 补 URL 级 i18n（`/{locale}/` 前缀、语言来源优先级）、词典按需加载与扩展模块机制；`index.md` §2 矩阵补 `seo-geo.md` / `vercel-deployment-audit.md`；`alignment-checklist.md` 文档计数 18 → 20。

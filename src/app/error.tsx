@@ -1,7 +1,8 @@
-// src/app/error.tsx v5.2.44
+// src/app/error.tsx v5.2.58
 'use client';
 
 import { useEffect } from 'react';
+import { captureException } from '@sentry/nextjs';
 import { ErrorState } from '@/components/state/state-views';
 import { logger } from '@/lib/logger';
 

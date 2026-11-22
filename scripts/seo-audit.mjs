@@ -1,8 +1,9 @@
-// scripts/seo-audit.mjs v5.2.57
+// scripts/seo-audit.mjs v5.2.58
 // 站点 HTML 结构审计：桌面 / 移动两种 UA 抽查多语言页面，报告写 reports/seo-audit.txt。
 // 用法：node scripts/seo-audit.mjs [baseUrl]（默认 http://localhost:3000）
 import fs from 'node:fs';
 import path from 'node:path';
+import { REPORTS_DIR, ensureDir } from './temp-paths.mjs';
 
 const base = (process.argv[2] ?? process.env.SEO_AUDIT_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
 const locales = ['en', 'zh-CN'];
@@ -90,7 +91,7 @@ for (const [device, userAgent] of Object.entries(userAgents)) {
 }
 
 lines.push('', `Total failures: ${failures}`);
-fs.mkdirSync('reports', { recursive: true });
-fs.writeFileSync(path.join('reports', 'seo-audit.txt'), `${lines.join('\n')}\n`);
+ensureDir(REPORTS_DIR);
+fs.writeFileSync(path.join(REPORTS_DIR, 'seo-audit.txt'), `${lines.join('\n')}\n`);
 console.log(`seo-audit: ${failures ? `FAIL (${failures})` : 'PASS'} → reports/seo-audit.txt`);
 process.exitCode = failures ? 1 : 0;
