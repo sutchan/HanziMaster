@@ -1,6 +1,6 @@
 ﻿# HanziMaster 文档中心
 
-> 文档版本：v5.2.55（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
 
 本目录是项目**规范文档的唯一存放位置**（`docs/` 共 18 篇）。本文给出文档分层、单一职责矩阵、术语与格式约定；根级 README / CONTRIBUTING 只是入口摘要，不另立规则。
 
@@ -38,6 +38,8 @@
 | [project.md](project.md) | 面向工具链的英文项目上下文摘要 | 独立结论（须与本文一致） |
 | [alignment-checklist.md](alignment-checklist.md) | 规范—原型—代码对齐现状与差异 | 待办清单（→ tasks.md） |
 | [code-review-2026-11-20.md](code-review-2026-11-20.md) | 2026-11-20 代码审查发现的缺陷清单、成因与修复方案（已修复项的历史记录） | 当前待办（→ tasks.md） |
+| [seo-geo.md](seo-geo.md) | SEO / GEO 量化目标、结构化数据与 `llms.txt` 验证口径 | 实现细节（→ 对应源码与 02 架构文档） |
+| [vercel-deployment-audit.md](vercel-deployment-audit.md) | Vercel 部署阻塞项审计结论与风险边界（历史快照） | 当前待办（→ tasks.md） |
 | [tasks.md](tasks.md) | **所有未完成任务 / 改进 / backlog 的唯一来源** | 已完成任务 |
 | [tasks-done.md](tasks-done.md) | 已完成任务归档（完成版本 + 实现要点） | 未完成任务 |
 

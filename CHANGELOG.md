@@ -2,6 +2,7 @@
 
 ## [5.2.57] - SEO / GEO 代码层收口与量化验证（与部署审计批次同版本）
 ### Changed
+- **规范文档对齐**：`coding-standards.md` 目录树补 `src/proxy.ts` / `theme-colors.css` / `settings.ts` / `extensions/` 与 `load-translations.ts`，§7 补设置读写约定，§9 补 URL 级 i18n（`/{locale}/` 前缀、语言来源优先级）、词典按需加载与扩展模块机制；`index.md` §2 矩阵补 `seo-geo.md` / `vercel-deployment-audit.md`；`alignment-checklist.md` 文档计数 18 → 20。
 - **语义化层级**：`/learn`、`/practice` 补页面级 `h1`（原 h2），其下区块标题统一 `h2`（原 h3），消除「无 h1 + h2→h3 跳级」；`/privacy`、`/terms` 去掉重复的 `<main>`，保留全局唯一地标。
 - **内链与面包屑**：新增 `Breadcrumbs` 组件（语义 `nav/ol` + `aria-current`），覆盖 learn / practice / privacy / terms，首页不渲染；文案与 JSON-LD 共用 `pageTitle` 映射。
 - **结构化数据按路由生成**：`StructuredData` 接收 path，`WebPage` 的 `@id`/`url` 随语言与路由变化；FAQPage 只在首页（与可见正文一致），内页改用 BreadcrumbList；逻辑抽为 `buildStructuredDataGraph` 纯函数，服务端与客户端共用。

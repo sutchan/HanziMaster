@@ -1,6 +1,6 @@
 # 编码规范
 
-> 文档版本：v5.2.55（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
 
 本文是项目**编码风格、命名约定、目录组织与质量门禁的唯一权威**。提交信息、分支与代码审查见 [git-workflow.md](git-workflow.md)，环境与命令见 [03-development.md](03-development.md)。其他文档只做摘要与链接，不得另立一套规则。
 
@@ -48,6 +48,7 @@
 ```
 HanziMaster/
 ├── src/
+│   ├── proxy.ts                 # Next.js 16 中间件：/{locale}/ 前缀协商与请求头注入
 │   ├── app/                     # App Router 路由与全局样式
 │   │   ├── page.tsx             # /          首页
 │   │   ├── learn/page.tsx       # /learn     学习页
@@ -57,19 +58,19 @@ HanziMaster/
 │   │   ├── loading.tsx          # 路由加载态
 │   │   ├── not-found.tsx        # 404 页面
 │   │   ├── globals.css          # 语义 design token（@theme）
-│   │   └── styles/              # utilities.css / keyframes.css
+│   │   └── styles/              # theme-colors.css / utilities.css / keyframes.css
 │   ├── components/              # 可复用组件
 │   │   ├── ui/                  # shadcn 风格基础原语（button / dialog / tooltip / badge）
 │   │   ├── learn/               # 学习页子组件
 │   │   ├── practice/            # 练习页子组件（含 writing-canvas-* 拆分模块）
 │   │   ├── state/               # EmptyState / ErrorState / LoadingSpinner
 │   │   ├── __tests__/ 或同级     # 组件测试就近放于所属模块 __tests__/
-│   │   └── *.tsx                # 跨页面组件（Provider、导航、卡片、Toast 等）
+│   │   └── *.tsx                # 跨页面组件（Provider、导航、设置面板、卡片、Toast 等）
 │   ├── hooks/                   # use-* 自定义 hooks + __tests__/
 │   └── lib/                     # 纯逻辑与数据
-│       ├── i18n/                # index.ts / translate.ts / translations/*.ts
+│       ├── i18n/                # index.ts / translate.ts / load-translations.ts / translations/*.ts + extensions/
 │       ├── __tests__/           # 纯逻辑单测
-│       └── *.ts                 # characters / storage / utils / version / progress-utils …
+│       └── *.ts                 # characters / settings / storage / stroke-order-loader / utils / version / progress-utils …
 ├── prototype/                   # 原型（6 个 HTML 骨架 + styles/ + scripts/）
 ├── scripts/                     # 可复用工具脚本（run-tests / check-line-count）
 ├── docs/                        # 规范文档
@@ -141,7 +142,7 @@ Next.js 约定文件名（`page.tsx` / `layout.tsx` / `error.tsx` / `loading.tsx
 
 - 根布局 `src/app/layout.tsx` 为 Server Component；当前 `/`、`/learn`、`/practice` 三个页面均为 Client Component（依赖 i18n Context 与浏览器 API），文件首行必须 `'use client';`。
 - 需要 hooks、事件、浏览器 API 的组件标 `'use client'`；纯静态内容与数据渲染保持 Server Component，不滥用客户端边界。
-- 状态管理用 React Context（`ThemeProvider` / `LocaleProvider`）+ localStorage；进度数据由 `useProgress` 读写，禁止硬编码假数据。
+- 状态管理用 React Context（`ThemeProvider` / `LocaleProvider`）+ localStorage；进度数据由 `useProgress` 读写，偏好设置（主题/语言/震动/减少动效）读写走 `src/lib/settings.ts`，禁止硬编码假数据。
 - 组件单一职责，Props 类型完整；副作用在 `useEffect` 内声明清理函数（事件监听、订阅、定时器）。
 - 公共函数写简洁 JSDoc；复杂逻辑写中文说明注释；注释单行、避免复述代码；CSS 用 `/* */`，TS/JS 用 `//`。
 - 错误边界与路由态使用 `error.tsx` / `loading.tsx` / `not-found.tsx`；空/错/加载态复用 `src/components/state/state-views.tsx`。
@@ -169,7 +170,9 @@ Next.js 约定文件名（`page.tsx` / `layout.tsx` / `error.tsx` / `loading.tsx
 - `src/lib/i18n/index.ts` 导出 `translations` / `locales` / `Locale` / `TranslationKey`；`t(key, vars?)` 的 key 受 `TranslationKey` 点分联合类型约束，插值用 `{{name}}`。
 - 新增或修改翻译键必须**同步 11 个语言文件**；`src/lib/__tests__/i18n.test.ts` 校验 11 语言叶子键与 `en` 完全一致，缺键即失败。
 - `footer.copyright` 使用 `{{versionLabel}}` 占位符，由 `layout-client.tsx` 用 `VERSION_LABEL` 插值；**不得**把版本号写进翻译文件。
-- 存储读写统一走 `src/lib/storage.ts` 的 `safeGetItem` / `safeSetItem`（`window.localStorage`），业务代码不直接访问 `localStorage`。
+- **URL 级 i18n**：`/{locale}/` 前缀由 `src/proxy.ts`（Next.js 16 中间件，非旧 `middleware.ts`）协商并注入 `x-hanzi-locale` / `x-hanzi-path`；语言来源优先级 = URL 前缀 > `?lang=` > cookie > 浏览器语言（`locale-provider.tsx`）。新增页面**自动**获得语言前缀，无需复制多套页面；站内 `Link` 目标是否带前缀见 tasks.md P1-44 的现行约定。
+- **词典按需加载**：基准包（`translations/*.ts`）仅静态承载基础键；超量文案按「扩展模块单独成文件」机制放 `translations/extensions/`（legal / a11y / meanings / settings），经 `extendTranslations()` 合并、缺失语言回退英文。语言基准包与扩展模块均受 200 行门禁约束，`i18n-lint` 校验各模块 11 语言覆盖。
+- 存储读写统一走 `src/lib/storage.ts` 的 `safeGetItem` / `safeSetItem` / `safeRemoveItem`（`window.localStorage`），业务代码不直接访问 `localStorage`。
 
 ## 10. 文件规模与拆分
 

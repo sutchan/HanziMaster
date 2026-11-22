@@ -1,6 +1,6 @@
 ﻿# 对齐检查清单
 
-> 文档版本：v5.2.55（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
 > 基线日期：2026-11-07
 
 本文记录**当前**规范文档、原型与代码实现的对齐状态。它是状态报告，**不是任务清单**：所有待办只在 [tasks.md](tasks.md) 维护。历史版本本文曾包含「113 项 100% 对齐」的快照与 24 个 UI 组件的统计，与代码不符，已整体替换；历史叙述保留在 `CHANGELOG.md` 中，不回改。
@@ -76,7 +76,7 @@
 
 ## 7. 文档体系
 
-- `docs/` 共 **18 篇**；[index.md](index.md) 的 §2 单一职责矩阵规定「一类规则只在一个文档定义」。
+- `docs/` 共 **20 篇**；[index.md](index.md) 的 §2 单一职责矩阵规定「一类规则只在一个文档定义」。
 - 文档版本戳格式统一为 `> 文档版本：vX.Y.Z（与项目版本同步，权威版本见 package.json）`；**只更新本次改动的文档**，未改动文档保留旧戳合法。
 - 术语、格式与 `npm` 字样豁免规则见 [index.md](index.md) §4 / §6。
 - 归档文档 `prototype/UI_UX_REVIEW.md`、`prototype/OPTIMIZATION_SUMMARY.md`、`prototype/PROJECT_STRUCTURE.md` 与 `CHANGELOG.md` 历史条目按「历史记录不篡改」保留原文，不作为当前状态依据。
