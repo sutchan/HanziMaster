@@ -47,14 +47,15 @@ export function QuizDialog({
         </DialogHeader>
 
         <div className="py-8">
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <span className="text-6xl font-light serif-font text-ink-900 dark:text-ink-50">
-              {character.hanzi}
-            </span>
-            <div className="text-right">
-              <p className="text-2xl font-medium text-ink-900 dark:text-ink-50">{character.pinyin}</p>
-              <p className="text-sm text-ink-500 dark:text-ink-400">{t(character.meaningKey)}</p>
-            </div>
+          {/* 题面只给拼音与释义：直接显示汉字会让选择题失去意义（F2）。答后揭示正确答案。 */}
+          <div id="practice-quiz-prompt" className="mb-8 text-center">
+            <p className="text-2xl font-medium text-ink-900 dark:text-ink-50">{character.pinyin}</p>
+            <p className="mt-2 text-sm text-ink-500 dark:text-ink-400">{t(character.meaningKey)}</p>
+            {answered && (
+              <p className="mt-4 text-xs text-ink-500 dark:text-ink-400">
+                {t('practice.correctAnswer')}: <span className="text-xl serif-font">{character.hanzi}</span>
+              </p>
+            )}
           </div>
 
           <div
@@ -121,7 +122,8 @@ export function QuizDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-full border-ink-200 text-ink-700 dark:border-ink-700 dark:text-ink-200">
             {t('common.cancel')}
           </Button>
-          <Button onClick={onNext} className="bg-vermilion-500 hover:bg-vermilion-600 text-primary-foreground rounded-full">
+          {/* 未作答不可跳过，避免进度统计静默丢失（F4） */}
+          <Button onClick={onNext} disabled={!answered} className="bg-vermilion-500 hover:bg-vermilion-600 text-primary-foreground rounded-full disabled:opacity-50">
             {t('practice.nextQuestion')}
           </Button>
         </DialogFooter>

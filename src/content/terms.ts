@@ -1,9 +1,9 @@
-// src/content/terms.ts v5.2.35
+// src/content/terms.ts v5.2.59
 
 import type { LegalSection } from './privacy';
 
 /** 服务条款正文：与隐私政策共用分段结构，双语并列展示。 */
-export const TERMS_UPDATED = '2026-11-05';
+export const TERMS_UPDATED = '2026-11-23';
 
 export const termsSections: LegalSection[] = [
   {
@@ -12,11 +12,11 @@ export const termsSections: LegalSection[] = [
     titleEn: 'Nature of the Service',
     paragraphs: [
       'HanziMaster 汉字大师是供个人学习汉字、笔顺与书写练习使用的教育类 Web 应用。它按「现状」提供，不构成学校课程、考试辅导或专业教学认证。',
-      '应用为纯前端项目：无需注册账户，不提供付费内容，不提供跨设备同步或云端备份。',
+      '应用为本地优先项目：无需注册账户，不提供付费内容。学习进度默认保存在本机；你可选择启用基于同步码的可选云同步，在设备间手动上传或下载进度。',
     ],
     paragraphsEn: [
       'HanziMaster is an educational web app for personal study of Chinese characters, stroke order, and handwriting. It is provided "as is" and is not a school course, exam preparation service, or professional certification.',
-      'It is client-only: no registration, no paid content, no cross-device sync, and no cloud backup.',
+      'It is local-first: no registration and no paid content. Progress stays on this device by default; you may opt into sync-code-based cloud sync to upload or download progress manually across devices.',
     ],
   },
   {

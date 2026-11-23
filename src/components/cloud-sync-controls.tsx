@@ -53,12 +53,12 @@ export function CloudSyncControls() {
     void navigator.clipboard?.writeText(code).catch(() => undefined);
   };
 
-  const request = async (method: 'GET' | 'PUT', backup?: string) => {
-    const query = method === 'GET' ? `?code=${code}` : '';
-    const response = await fetch(`/api/progress${query}`, {
-      method,
-      headers: method === 'PUT' ? { 'Content-Type': 'application/json' } : undefined,
-      body: method === 'PUT' ? JSON.stringify({ code, backup }) : undefined,
+  // 同步码只经 POST 请求体传递，不进入 URL / 访问日志。
+  const request = async (backup?: string) => {
+    const response = await fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(backup === undefined ? { code } : { code, backup }),
     });
     if (response.status === 503) throw new Error('not_configured');
     if (!response.ok) throw new Error('request_failed');
@@ -75,7 +75,7 @@ export function CloudSyncControls() {
     const backup = createProgressBackup(progress);
     setBusy(true);
     try {
-      await request('PUT', backup);
+      await request(backup);
       toast.success(t('cloud.uploadDone'));
     } catch (err) {
       toast.error(err instanceof Error && err.message === 'not_configured'
@@ -89,7 +89,7 @@ export function CloudSyncControls() {
     if (!isSyncCode(code)) return;
     setBusy(true);
     try {
-      const data = await request('GET');
+      const data = await request();
       if (!data.backup) throw new Error('request_failed');
       const progress = parseProgressBackup(data.backup);
       if (!trySetItem(PROGRESS_STORAGE_KEY, progress)) throw new Error('storage_failed');

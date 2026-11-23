@@ -1,4 +1,4 @@
-// src/content/privacy.ts v5.2.35
+// src/content/privacy.ts v5.2.59
 
 export interface LegalSection {
   id: string;
@@ -10,10 +10,10 @@ export interface LegalSection {
 
 /**
  * 隐私政策正文。内容严格对应应用实际行为：
- * 仅 localStorage 三类偏好、同意后才加载 GA4、Google Fonts 构建期获取、无账户与后端。
- * 双语正文并列展示，避免按客户端语言切换出现合规文本缺漏。
+ * localStorage 偏好与进度、同意后才加载 GA4、可选的云同步 API（同步码即凭证）、
+ * Google Fonts 构建期获取、无账户体系。双语正文并列展示。
  */
-export const PRIVACY_UPDATED = '2026-11-05';
+export const PRIVACY_UPDATED = '2026-11-23';
 
 export const privacySections: LegalSection[] = [
   {
@@ -21,12 +21,12 @@ export const privacySections: LegalSection[] = [
     title: '概述',
     titleEn: 'Overview',
     paragraphs: [
-      'HanziMaster 汉字大师是纯前端、本地优先的汉字学习应用。我们没有账户体系，不运行业务后端 API，也不会把你输入的学习内容上传到我们的服务器。',
-      '本政策说明应用在你的设备上保存了什么、在何种条件下加载第三方统计脚本，以及你可以如何控制这些数据。',
+      'HanziMaster 汉字大师是本地优先的汉字学习应用。我们没有账户体系；学习进度默认只保存在你的设备上。应用提供一个可选的云同步端点：只有当你主动生成同步码并点击「上传」时，学习进度才会被发送到云端存储。',
+      '本政策说明应用在你的设备上保存了什么、在何种条件下加载第三方统计脚本、云同步如何工作，以及你可以如何控制这些数据。',
     ],
     paragraphsEn: [
-      'HanziMaster is a local-first, client-only Chinese character learning app. There are no accounts, no backend API, and no upload of the content you study to any server operated by us.',
-      'This policy describes what is stored on your device, when third-party analytics is loaded, and how you control it.',
+      'HanziMaster is a local-first Chinese character learning app. There are no accounts; progress stays on your device by default. An optional cloud sync endpoint exists: progress is sent to cloud storage only when you actively generate a sync code and choose "Upload".',
+      'This policy describes what is stored on your device, when third-party analytics is loaded, how cloud sync works, and how you control this data.',
     ],
   },
   {
@@ -34,12 +34,25 @@ export const privacySections: LegalSection[] = [
     title: '本地存储',
     titleEn: 'Local Storage',
     paragraphs: [
-      '应用使用浏览器 localStorage 保存三类数据：界面主题（浅色/深色/跟随系统）、界面语言，以及学习进度（练习记录、连胜天数、正确率、周活动）。',
-      '这些数据只保存在当前浏览器与当前设备上，不会自动同步到其他设备。清除浏览器站点数据即可全部删除；应用内不提供账户级数据查看或导出接口。',
+      '应用使用浏览器 localStorage 保存界面主题（浅色/深色/跟随系统）、界面语言、学习进度（练习记录、连胜天数、正确率、周活动），以及你主动启用的云同步码、PWA 安装提示忽略标记与统计同意状态。',
+      '这些数据默认只保存在当前浏览器与当前设备上，不会自动同步。清除浏览器站点数据即可删除本地全部数据；你也可以通过设置中的导入导出功能主动备份或删除进度。',
     ],
     paragraphsEn: [
-      'The app stores three kinds of data in browser localStorage: theme preference (light/dark/system), interface language, and learning progress (practice records, streaks, accuracy, weekly activity).',
-      'This data stays in the current browser on the current device and is not synced. Clearing site data in your browser removes all of it.',
+      'The app uses browser localStorage for theme preference (light/dark/system), interface language, learning progress (practice records, streaks, accuracy, weekly activity), and — if you enable them — your cloud sync code, the PWA install dismissal flag, and analytics consent.',
+      'By default this data stays on the current browser and device and is never synced automatically. Clearing site data removes all local data; you can also export, import, or delete progress from Settings.',
+    ],
+  },
+  {
+    id: 'privacy-cloud-sync',
+    title: '云同步（可选）',
+    titleEn: 'Cloud Sync (Optional)',
+    paragraphs: [
+      '云同步完全自愿：只有当你生成同步码并主动上传时，进度备份才会写入私有云存储。同步码是访问该备份的唯一凭证，等同于密码——任何持有它的人都能读取或覆盖对应进度。请不要公开分享同步码。',
+      '同步码仅以 32 位随机十六进制字符串形式存在，不会上传到统计服务；读取请求使用 POST 请求体传递，避免出现在服务器访问日志中。删除同步码仅删除本地凭证，若要彻底清除云端副本，请在更换同步码前联系站点维护者。',
+    ],
+    paragraphsEn: [
+      'Cloud sync is entirely optional: a progress backup is written to private cloud storage only after you generate a sync code and explicitly upload. The sync code is the only credential for that backup, equivalent to a password — anyone holding it can read or overwrite the progress. Do not share it publicly.',
+      'The code is a random 32-character hex string and is never sent to analytics. Read requests pass the code in the POST body so it does not appear in server access logs. Removing the code locally does not delete the remote copy.',
     ],
   },
   {
@@ -76,11 +89,11 @@ export const privacySections: LegalSection[] = [
     titleEn: 'Children and Educational Use',
     paragraphs: [
       '本应用面向通用汉字学习，不刻意收集可识别个人身份的信息。若由监护人指导未成年人使用，建议同时检查浏览器与第三方统计设置。',
-      '政策更新时我们会修改页面顶部的更新日期；重大变更会在应用内提示。',
+      '政策更新时我们会修改页面顶部的更新日期。',
     ],
     paragraphsEn: [
       'The app is a general-purpose learning tool and does not intentionally collect personally identifiable information. Guardians supervising minors should review browser and analytics settings as well.',
-      'Updates to this policy change the date shown at the top of the page; material changes are highlighted in the app.',
+      'Updates to this policy change the date shown at the top of the page.',
     ],
   },
 ];

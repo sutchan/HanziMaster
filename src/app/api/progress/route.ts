@@ -1,81 +1,51 @@
-// src/app/api/progress/route.ts v5.2.58
-// Vercel Blob 进度同步端点：私有 store，同步码即能力凭证；未配置 token 时 503 降级。
+// src/app/api/progress/route.ts v5.2.59
+// 云同步端点：同步码仅经 POST 请求体传递（不进 URL/日志）；强制动态 + 限流 + 严格校验。
 import { NextResponse, type NextRequest } from 'next/server';
-import { get, put } from '@vercel/blob';
-import { parseProgressBackup, createProgressBackup } from '@/lib/progress-transfer';
-import { isSyncCode, blobPath, MAX_BACKUP_BYTES } from '@/lib/cloud-sync';
+import { isSyncCode } from '@/lib/cloud-sync';
+import {
+  syncConfigured, rateLimit, readCloudBackup, writeCloudBackup, syncErrorMessage,
+} from '@/lib/cloud-sync-server';
 
 export const dynamic = 'force-dynamic';
 
 const noStore = { 'Cache-Control': 'no-store' };
-const isEmpty = (p: { learnedCharIds: unknown[]; quizResults: unknown[]; dailyActivity: object }): boolean =>
-  p.learnedCharIds.length === 0 && p.quizResults.length === 0 && Object.keys(p.dailyActivity).length === 0;
-const configured = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 
-function reject(code: string, status: number, message: string) {
-  return NextResponse.json({ error: code, message }, { status, headers: noStore });
+function reject(code: string, status: number) {
+  return NextResponse.json(
+    { error: code, message: syncErrorMessage(code) },
+    { status, headers: { ...noStore, 'Retry-After': status === 429 ? '60' : '0' } },
+  );
 }
 
-/** 读取云端进度：同步码经严格格式校验后才拼路径，杜绝路径穿越。 */
-export async function GET(request: NextRequest) {
-  if (!configured()) return reject('not_configured', 503, 'Cloud sync is not configured');
-  const code = request.nextUrl.searchParams.get('code') ?? '';
-  if (!isSyncCode(code)) return reject('invalid_code', 400, 'Invalid sync code');
+/**
+ * 统一读取入口：同步码只从 JSON body 读取。
+ * 原 GET ?code= 通道已移除，避免能力凭证落入服务器/CDN 访问日志。
+ */
+export async function POST(request: NextRequest) {
+  if (!syncConfigured()) return reject('not_configured', 503);
 
-  try {
-    const file = await get(blobPath(code), { access: 'private' });
-    if (!file) return reject('not_found', 404, 'No cloud progress for this code');
-    // 先按响应头拒绝超大对象，避免把整个远端内容读进内存后才返回 413；头缺失时退化为读取后的体积校验
-    const contentLength = Number(file.headers.get('content-length') ?? 0);
-    if (contentLength > MAX_BACKUP_BYTES) {
-      return reject('too_large', 413, 'Cloud backup exceeds size limit');
-    }
-    const raw = await new Response(file.stream).text();
-    if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) {
-      return reject('too_large', 413, 'Cloud backup exceeds size limit');
-    }
-    // 复用 PUT 的严格解析：损坏 blob / 缺少 progress 字段时抛错 → 502，不再伪装成空进度；
-    // 原样返回 raw 以保留真实 exportedAt（读取时刻重算会让备份时间失真）。
-    const progress = parseProgressBackup(raw);
-    if (isEmpty(progress)) return reject('empty_backup', 502, 'Cloud backup contains no progress');
-    return NextResponse.json({ backup: raw }, { headers: noStore });
-  } catch {
-    return reject('read_failed', 502, 'Failed to read cloud progress');
-  }
-}
-
-/** 上传进度：先按既有备份格式严格校验，再覆盖写入同一路径。 */
-export async function PUT(request: NextRequest) {
-  if (!configured()) return reject('not_configured', 503, 'Cloud sync is not configured');
   let body: { code?: unknown; backup?: unknown };
   try {
     body = await request.json();
   } catch {
-    return reject('invalid_json', 400, 'Invalid request body');
+    return reject('invalid_json', 400);
   }
-  if (typeof body.code !== 'string' || !isSyncCode(body.code)) {
-    return reject('invalid_code', 400, 'Invalid sync code');
-  }
-  if (typeof body.backup !== 'string' || !body.backup) {
-    return reject('invalid_backup', 400, 'Invalid backup payload');
-  }
+  if (typeof body.code !== 'string' || !isSyncCode(body.code)) return reject('invalid_code', 400);
+  if (!rateLimit(body.code)) return reject('rate_limited', 429);
 
-  try {
-    const progress = parseProgressBackup(body.backup);
-    if (isEmpty(progress)) return reject('empty_progress', 400, 'Refusing to overwrite cloud progress with empty data');
-    const serialized = createProgressBackup(progress);
-    // 校验最终要持久化的字符串，避免写进去的 blob 超过 GET 上限而永久读不回来
-    if (new TextEncoder().encode(serialized).length > MAX_BACKUP_BYTES) {
-      return reject('too_large', 413, 'Backup exceeds size limit');
-    }
-    await put(blobPath(body.code), serialized, {
-      access: 'private',
-      contentType: 'application/json',
-      allowOverwrite: true,
-      addRandomSuffix: false,
-    });
-    return NextResponse.json({ ok: true }, { headers: noStore });
-  } catch {
-    return reject('write_failed', 502, 'Failed to write cloud progress');
+  const writing = body.backup !== undefined;
+  if (writing && (typeof body.backup !== 'string' || !body.backup)) {
+    return reject('invalid_backup', 400);
   }
+  const result = writing
+    ? await writeCloudBackup(body.code, body.backup as string)
+    : await readCloudBackup(body.code);
+
+  if (!result.ok) return reject(result.code, result.status);
+  return NextResponse.json(writing ? { ok: true } : { backup: result.backup }, { headers: noStore });
+}
+
+/** 旧版 GET 通道永久关闭：凭证不得出现在 URL 中。 */
+export async function GET() {
+  return reject('use_post', 405);
 }

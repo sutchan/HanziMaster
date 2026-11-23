@@ -10,6 +10,7 @@ import { settingsByLocale } from './settings';
 import { privacyByLocale } from './privacy';
 import { pwaByLocale } from './pwa';
 import { progressByLocale } from './progress';
+import { quizByLocale } from './quiz';
 
 /** 基准语言包结构；扩展模块单独成文件，避免任一语言文件超过 200 行。 */
 type BaseTranslations = typeof import('../en').en;
@@ -27,6 +28,7 @@ export function extendTranslations(base: BaseTranslations, locale: string) {
   const privacy = privacyByLocale[locale] ?? privacyByLocale.en;
   const pwa = pwaByLocale[locale] ?? pwaByLocale.en;
   const progress = progressByLocale[locale] ?? progressByLocale.en;
+  const quiz = quizByLocale[locale] ?? quizByLocale.en;
   const seo = seoByLocale[locale] ?? seoByLocale.en;
   const geo = geoByLocale[locale] ?? geoByLocale.en;
 
@@ -44,6 +46,7 @@ export function extendTranslations(base: BaseTranslations, locale: string) {
       canvasLabel: a11y.practice.canvasLabel,
       keyboardLabel: a11y.practice.keyboardLabel,
       keyboardHint: a11y.practice.keyboardHint,
+      correctAnswer: quiz.correctAnswer,
       meanings,
     },
     settings: { ...settings, ...privacy },
