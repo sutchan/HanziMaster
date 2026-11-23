@@ -6,7 +6,8 @@ const GRID_CLASS = 'grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-
 
 export default function LearnLoading() {
   return (
-    <div className="min-h-screen bg-linear-to-b from-ink-50/50 to-background dark:from-ink-950/50 dark:to-background" aria-hidden="true">
+    <div className="min-h-screen bg-linear-to-b from-ink-50/50 to-background dark:from-ink-950/50 dark:to-background" role="status" aria-busy="true" aria-label="Loading">
+      <span className="sr-only">Loading…</span>
       <div className="max-w-6xl mx-auto px-6 py-16 safe-bottom">
         {/* 标题区占位 */}
         <div className="text-center mb-12">

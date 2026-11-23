@@ -75,7 +75,7 @@ function ToastItem({ id, message, type, duration = 5000, onRemove }: Toast & { o
 
   return (
     <div
-      role="alert"
+      role={type === 'error' ? 'alert' : 'status'}
       className={cn(
         'flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg min-w-[280px] max-w-[400px]',
         'transition-[opacity,transform] duration-300',
@@ -91,7 +91,7 @@ function ToastItem({ id, message, type, duration = 5000, onRemove }: Toast & { o
           if (exitTimer.current) clearTimeout(exitTimer.current);
           exitTimer.current = setTimeout(() => onRemove(id), 300);
         }}
-        className="p-1 rounded-lg hover:bg-ink-900/5 dark:hover:bg-ink-100/10 transition-colors"
+        className="touch-target p-1 rounded-lg hover:bg-ink-900/5 dark:hover:bg-ink-100/10 transition-colors"
         aria-label={t('common.closeNotification')}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

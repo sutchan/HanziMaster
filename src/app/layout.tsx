@@ -1,4 +1,5 @@
-// src/app/layout.tsx v5.2.57
+// src/app/layout.tsx v5.2.59
+import { cache } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';
 import { Space_Grotesk, Playfair_Display, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google';
@@ -26,6 +27,8 @@ const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
+  // 仅标题/序号使用，非首屏必需：不预载以减少首屏字体请求（T3）
+  preload: false,
 });
 const notoSerifSC = Noto_Serif_SC({
   subsets: ['latin'],
@@ -37,6 +40,8 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  // 仅键盘提示等次要位置使用：不预载（T3）
+  preload: false,
 });
 
 // 生产漏配 SITE_URL 时构建日志明确告警（不阻断 CI，部署清单另列为必填）。
@@ -49,14 +54,14 @@ const THEME_INIT_SCRIPT =
   "d.classList.toggle('dark',v==='dark'||(v==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))}catch(e){}";
 
 /** 语言来自 proxy 注入的请求头（URL 前缀），其次 cookie；路径用于 canonical / hreflang。 */
-const requestContext = async () => {
-  const requestHeaders = await headers();
-  const cookieStore = await cookies();
+const requestContext = cache(async () => {
+  // 并行读取两个动态 API（T2）；cache() 让 metadata 与 layout 共享单次结果
+  const [requestHeaders, cookieStore] = await Promise.all([headers(), cookies()]);
   return {
     locale: resolveLocale(requestHeaders, cookieStore.get(LOCALE_COOKIE)?.value),
     path: resolvePath(requestHeaders),
   };
-};
+});
 
 /** 按当前语言生成 title / description / canonical / hreflang / OG（构造逻辑见 build-metadata.ts）。 */
 export async function generateMetadata(): Promise<Metadata> {

@@ -59,7 +59,7 @@ export default async function TermsPage() {
           href={localizedHref(locale, '/privacy')}
           className="text-primary underline-offset-4 hover:underline"
         >
-          隐私政策 / Privacy Policy
+          {legal.privacyLink} / {legalByLocale.en.privacyLink}
         </Link>
       </footer>
     </div>

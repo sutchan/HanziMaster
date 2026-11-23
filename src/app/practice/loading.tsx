@@ -3,7 +3,8 @@
 
 export default function PracticeLoading() {
   return (
-    <div className="min-h-screen bg-linear-to-b from-ink-50/50 to-background dark:from-ink-950/50 dark:to-background" aria-hidden="true">
+    <div className="min-h-screen bg-linear-to-b from-ink-50/50 to-background dark:from-ink-950/50 dark:to-background" role="status" aria-busy="true" aria-label="Loading">
+      <span className="sr-only">Loading…</span>
       <div className="max-w-6xl mx-auto px-6 py-16 safe-bottom">
         {/* 标题区占位 */}
         <div className="text-center mb-16">
@@ -11,9 +12,9 @@ export default function PracticeLoading() {
           <div className="h-6 w-80 max-w-full mx-auto rounded-lg bg-ink-100 dark:bg-ink-800 animate-pulse" />
         </div>
 
-        {/* 练习选项占位（书写 / 拼音测验，两列） */}
-        <div className="grid sm:grid-cols-2 gap-6 mb-12">
-          {Array.from({ length: 2 }, (_, i) => (
+        {/* 练习选项占位（书写 / 拼音测验 / 学习进度，三列） */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+          {Array.from({ length: 3 }, (_, i) => (
             <div key={i} className="h-44 rounded-2xl bg-ink-100 dark:bg-ink-800 animate-pulse" />
           ))}
         </div>
