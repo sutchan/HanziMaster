@@ -9,16 +9,15 @@ import {
 } from '../cloud-sync-server';
 
 const CODE = 'a'.repeat(32);
+// 备份内容须符合当前 ProgressData schema（字符 id 为正整数、时间戳为毫秒数、日期键为 YYYY-MM-DD）
 const backup = JSON.stringify({
   app: 'HanziMaster',
   version: 1,
   exportedAt: new Date().toISOString(),
   progress: {
-    learnedCharIds: ['yong'],
-    quizResults: [{ charId: 'yong', correct: true, at: '2026-11-23T00:00:00.000Z' }],
-    dailyActivity: {},
-    streak: 1,
-    accuracy: 1,
+    learnedCharIds: [1],
+    quizResults: [{ charId: 1, correct: true, timestamp: Date.now() }],
+    dailyActivity: { '2026-11-23': true },
   },
 });
 
@@ -59,7 +58,7 @@ describe('cloud-sync-server', () => {
   it('validates before overwriting and never writes empty progress', async () => {
     const empty = JSON.stringify({
       app: 'HanziMaster', version: 1, exportedAt: new Date().toISOString(),
-      progress: { learnedCharIds: [], quizResults: [], dailyActivity: {}, streak: 0, accuracy: 0 },
+      progress: { learnedCharIds: [], quizResults: [], dailyActivity: {} },
     });
     expect((await writeCloudBackup(CODE, empty)).ok).toBe(false);
     expect(mockPut).not.toHaveBeenCalled();
