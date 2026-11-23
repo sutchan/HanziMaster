@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## [5.2.59] - 云同步 Blob 凭证改用应用自有环境变量名
+### Changed
+- **Blob 凭证映射**：新增 `src/lib/blob-credentials.ts`，把应用自有变量名 `BLOB_HANZI_STORE_ID` / `BLOB_HANZI_READ_WRITE_TOKEN` 显式传给 `@vercel/blob`（`token` / `storeId` 选项）。SDK 默认只读 `BLOB_READ_WRITE_TOKEN` / `BLOB_STORE_ID`，不显式传入时自定义变量名不会生效；空值一律不传，避免被静默回退。SDK 默认名保留为回退，旧部署不受影响。
+- **可用性判定**：`syncConfigured()` 改为基于上述映射——有读写令牌直接可用；仅配置 Store ID 时依赖 Vercel OIDC（平台运行时自动注入 OIDC token，本地 / CI 需显式 `VERCEL_OIDC_TOKEN`），否则 `/api/progress` 保持 503 降级。
+- `scripts/check-deploy-env.mjs`：Blob 预检改查新变量名（兼容旧名），缺失提示文案同步。
+- `.env.example` 与 `docs/01-overview.md` §7、`docs/04-api-reference.md`、`docs/project.md`、`docs/02-architecture.md`、`docs/05-deployment.md`、`docs/vercel-deployment-audit.md` 同步新变量名；`/api/progress` 文档一并纠正为 `POST { code, backup? }`（此前仍写已下线的 `GET ?code=` / `PUT`）。
+### Added
+- `src/lib/__tests__/blob-credentials.test.ts`：变量优先级、空值剔除与配置判定单测；`cloud-sync-server` 用例补凭证传递断言（read-write token 优先、OIDC 模式只传 storeId）。
+
 ## [5.2.58] - 临时文件规范收口：移除历史 .tmp 与最后一处脚本硬编码
 ### Fixed（全量代码审查批次）
 - **服务端 / SEO**：根 `error.tsx` 补齐 Sentry 上报（与其余三个错误边界一致）；`global-error.tsx` 初始语言由写死 `zh-CN` 改为 `DEFAULT_LOCALE=en` 并优先读取 `html lang`；`getPageSeo` 与根布局同构读取 locale cookie，避免标题语言与 `html lang` 分叉；`syncMetadataLocale` 客户端切语言同步 `og:url`；进度 API GET 在读取 blob 前按 `content-length` 拒绝超大对象、PUT 写入前校验最终序列化体积；`createProgressBackup` 改紧凑 JSON、解析端 O(1) 快速拒绝，三处共用 `MAX_BACKUP_BYTES`。

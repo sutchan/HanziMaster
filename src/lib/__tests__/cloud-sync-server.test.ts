@@ -25,7 +25,13 @@ describe('cloud-sync-server', () => {
   beforeEach(() => {
     mockGet.mockReset();
     mockPut.mockReset();
-    vi.stubEnv('BLOB_READ_WRITE_TOKEN', 'token');
+    // 应用自有变量名优先；SDK 默认的全局名同时清空，确保断言只反映新命名
+    vi.stubEnv('BLOB_HANZI_READ_WRITE_TOKEN', 'token');
+    vi.stubEnv('BLOB_HANZI_STORE_ID', '');
+    vi.stubEnv('BLOB_READ_WRITE_TOKEN', '');
+    vi.stubEnv('BLOB_STORE_ID', '');
+    vi.stubEnv('VERCEL_OIDC_TOKEN', '');
+    vi.stubEnv('VERCEL', '');
   });
 
   it('rate-limits per sync code within a 60s window', () => {
@@ -73,14 +79,52 @@ describe('cloud-sync-server', () => {
 
   it('reports config state and maps error codes to messages', () => {
     expect(syncConfigured()).toBe(true);
-    vi.stubEnv('BLOB_READ_WRITE_TOKEN', '');
-    vi.stubEnv('BLOB_STORE_ID', 'store-id');
+    vi.stubEnv('BLOB_HANZI_READ_WRITE_TOKEN', '');
+    vi.stubEnv('BLOB_HANZI_STORE_ID', 'store-id');
     vi.stubEnv('VERCEL_OIDC_TOKEN', '');
     expect(syncConfigured()).toBe(false);
     vi.stubEnv('VERCEL_OIDC_TOKEN', 'oidc-token');
     expect(syncConfigured()).toBe(true);
-    vi.stubEnv('BLOB_STORE_ID', '');
+    vi.stubEnv('BLOB_HANZI_STORE_ID', '');
     expect(syncErrorMessage('rate_limited')).toBe('Too many requests');
     expect(syncErrorMessage('unknown')).toContain('failed');
+  });
+
+  it('passes the application-scoped read-write token to the blob SDK', async () => {
+    vi.stubEnv('BLOB_HANZI_READ_WRITE_TOKEN', 'hanzi-token');
+    vi.stubEnv('BLOB_READ_WRITE_TOKEN', 'global-token');
+    mockGet.mockResolvedValueOnce({
+      headers: new Headers({ 'content-length': String(backup.length) }),
+      stream: new Response(backup).body,
+    });
+
+    await readCloudBackup(CODE);
+    expect(mockGet).toHaveBeenCalledWith(
+      `hanzi-master/progress/${CODE}.json`,
+      expect.objectContaining({ access: 'private', token: 'hanzi-token' }),
+    );
+
+    await writeCloudBackup(CODE, backup);
+    expect(mockPut).toHaveBeenCalledWith(
+      `hanzi-master/progress/${CODE}.json`,
+      expect.any(String),
+      expect.objectContaining({ access: 'private', token: 'hanzi-token' }),
+    );
+  });
+
+  it('passes the store id for OIDC mode and treats it as configured on Vercel', async () => {
+    vi.stubEnv('BLOB_HANZI_READ_WRITE_TOKEN', '');
+    vi.stubEnv('BLOB_HANZI_STORE_ID', 'store_hanzi');
+    vi.stubEnv('VERCEL', '1');
+    expect(syncConfigured()).toBe(true);
+
+    mockGet.mockResolvedValueOnce({
+      headers: new Headers({ 'content-length': String(backup.length) }),
+      stream: new Response(backup).body,
+    });
+    await readCloudBackup(CODE);
+    const options = mockGet.mock.calls[0][1] as Record<string, unknown>;
+    expect(options.storeId).toBe('store_hanzi');
+    expect(options).not.toHaveProperty('token');
   });
 });

@@ -27,7 +27,7 @@
 | P1-E | **代码侧已闭环** | Release 门禁不再接受 skipped；部署文档明确「Actions 部署与 Git Integration 二选一」 | 关闭其中一条部署通道（推荐保留 Actions） |
 | P2-A | **已修复** | `vercel.json` immutable 缓存收窄到 `/_next/static/(.*)`；`/sw.js` 改 `must-revalidate`；`check:csp` 扩展校验 | 部署后核对响应头 |
 | P2-B | 环境约束（无法从代码消除） | 文档明确构建期需访问 Google Fonts，并通过自托管产物验证 | 平台出网策略放行（Vercel 默认可访问） |
-| P2-C | **已修复** | `MAX_BACKUP_BYTES` 5 MB → 4 MB（低于 Serverless 4.5 MB body limit）；`.env.example` 补 `BLOB_STORE_ID` OIDC 说明 | 创建 Blob store 并配置 Store ID |
+| P2-C | **已修复** | `MAX_BACKUP_BYTES` 5 MB → 4 MB（低于 Serverless 4.5 MB body limit）；`.env.example` 补 `BLOB_HANZI_STORE_ID` OIDC 说明 | 创建 Blob store 并配置 `BLOB_HANZI_STORE_ID` |
 | P2-D | **已修复** | `@vercel/blob` 钉为 `2.9.0`；Vercel CLI 钉为 `66.5.0`；`check:csp` 覆盖 Vercel 配置；`.playwright-cli/` 纳入 gitignore 与根目录门禁白名单 | — |
 
 > **剩余平台动作清单**：① GitHub Secrets 三项；② Vercel `NEXT_PUBLIC_SITE_URL`；③ Vercel Node 24.11.x；④ Blob store（可选）；⑤ GA/Sentry 变量（可选）；⑥ 关闭双部署通道之一。完成 ①②③⑥ 后重新触发 Deploy 并按 §5 的 `curl` 清单复验。
@@ -137,6 +137,7 @@
 - **表现**：`src/app/api/progress/route.ts:13,21,44` 只有在 `BLOB_READ_WRITE_TOKEN` 或 `BLOB_STORE_ID` 存在时才启用，否则 `/api/progress` 返回 503、前端保持本地模式；`.env.example:30-33` 只说明本地读写 token，**未说明线上 OIDC 需要的 `BLOB_STORE_ID`**。`src/lib/cloud-sync.ts:8` 的 `MAX_BACKUP_BYTES = 5 * 1024 * 1024`（5 MB）高于 Vercel Serverless 常见 4.5 MB 请求体上限。
 - **影响**：未配置 Blob store 时云同步功能不可用（核心学习/练习不受影响）；配置后接近 5 MB 的备份可能在平台层被 413 拒绝，早于应用校验。
 - **排查信息**：Vercel 项目是否关联 Blob store、`BLOB_STORE_ID` 是否存在；控制台 Blob 用量；云同步按钮的实际错误码。
+- **现状（2026-11-23）**：Blob 凭证改用应用自有变量名 `BLOB_HANZI_STORE_ID` / `BLOB_HANZI_READ_WRITE_TOKEN`（`src/lib/blob-credentials.ts` 显式传给 `@vercel/blob`，SDK 默认的 `BLOB_STORE_ID` / `BLOB_READ_WRITE_TOKEN` 仍兼容）；平台侧按新变量名配置即可。
 - **验证**：`curl -sS -i https://<域名>/api/progress?code=test` ——未配置时预期 503 `not_configured`；配置后小备份 PUT/GET 往返成功，>4.5 MB 备份在平台层的行为需实测后把应用上限下调至 ≤4 MB。
 
 ### P2-D · 文档/配置漂移与不可复现的部署命令

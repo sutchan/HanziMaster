@@ -46,7 +46,7 @@
 | `/practice` | `src/app/practice/page.tsx` | Client | 书写练习、拼音测验、真实进度统计 |
 | `/privacy` · `/terms` | `src/app/privacy/page.tsx` / `terms/page.tsx` | Server | 法律条款静态页（文案在 `src/content/`） |
 | `/api/health` | `src/app/api/health/route.ts` | Server | 健康检查，返回版本与 build 编号 |
-| `/api/progress` | `src/app/api/progress/route.ts` | Server | 可选云端进度同步（`GET ?code=` / `PUT {code, backup}`，Vercel Blob 私有 store；未配置 token 时 503 降级） |
+| `/api/progress` | `src/app/api/progress/route.ts` | Server | 可选云端进度同步（`POST { code, backup? }`，Vercel Blob 私有 store；未配置凭证时 503 降级） |
 | SEO / PWA | `manifest.ts` / `robots.ts` / `sitemap.ts` | Server | manifest、robots、sitemap 生成（manifest 按 cookie 语言输出 `lang` / `dir`） |
 | 中间件 | `src/proxy.ts` | Edge | Next.js 16 中间件约定文件（非旧 `middleware.ts`）：`/{locale}/` 前缀协商、rewrite 并注入 `x-hanzi-locale` / `x-hanzi-path` 请求头 |
 | 路由态 | `error.tsx` / `loading.tsx` / `not-found.tsx` / `global-error.tsx`（含 `learn/`、`practice/` 级 error） | Client | 错误边界、加载、404 |

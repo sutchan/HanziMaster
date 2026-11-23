@@ -1,4 +1,4 @@
-// scripts/check-deploy-env.mjs v5.2.57
+// scripts/check-deploy-env.mjs v5.2.59
 // 部署环境变量预检：校验站点 URL / GA4 / Sentry / Blob 的形状，不打印任何值。
 // 用法：node scripts/check-deploy-env.mjs [--strict] [--env-file .vercel/.env.production.local]
 import fs from 'node:fs';
@@ -107,9 +107,10 @@ if (dsn) {
   note('SENTRY_DSN', 'OFF (optional)');
 }
 
-const blobToken = Boolean(env.BLOB_READ_WRITE_TOKEN);
-const blobStore = Boolean(env.BLOB_STORE_ID);
-if (!blobToken && !blobStore) warnings.push('云同步未配置（BLOB_STORE_ID / BLOB_READ_WRITE_TOKEN 均缺失，/api/progress 返回 503）');
+// 应用自有变量名优先（SDK 默认的全局名仍兼容）
+const blobToken = Boolean(String(env.BLOB_HANZI_READ_WRITE_TOKEN || env.BLOB_READ_WRITE_TOKEN || '').trim());
+const blobStore = Boolean(String(env.BLOB_HANZI_STORE_ID || env.BLOB_STORE_ID || '').trim());
+if (!blobToken && !blobStore) warnings.push('云同步未配置（BLOB_HANZI_STORE_ID / BLOB_HANZI_READ_WRITE_TOKEN 均缺失，/api/progress 返回 503）');
 note('Vercel Blob', blobStore ? 'OK (OIDC)' : blobToken ? 'OK (token)' : 'OFF (optional)');
 
 ensureDir(REPORTS_DIR);

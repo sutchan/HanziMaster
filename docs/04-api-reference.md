@@ -174,7 +174,7 @@ export function Example() {
 | 端点 | 方法 | 响应 |
 |------|------|------|
 | `/api/health` | `GET` | `{ status: 'ok', version, build }`；`version` / `build` 取 `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_BUILD_ID`，未注入时为 `unknown`。用于部署后健康探测，无鉴权、无副作用。 |
-| `/api/progress` | `GET` / `PUT` | 云端进度同步。`GET ?code=<32位十六进制同步码>` 读；`PUT { code, backup }` 写（复用 `createProgressBackup` 格式）。私有 Vercel Blob store，未配置 `BLOB_READ_WRITE_TOKEN` / `BLOB_STORE_ID` 时返回 `503 not_configured`，前端降级为纯 localStorage。无用户账户，同步码即凭证，须保密。 |
+| `/api/progress` | `POST` | 云端进度同步。请求体 `{ code, backup? }`：`code` 为 32 位十六进制同步码，`backup` 省略时读、携带时写（复用 `createProgressBackup` 格式）。私有 Vercel Blob store，未配置 `BLOB_HANZI_READ_WRITE_TOKEN` / `BLOB_HANZI_STORE_ID` 时返回 `503 not_configured`，前端降级为纯 localStorage。无用户账户，同步码即凭证，须保密。 |
 
 `/api/health` 用于部署探测；`/api/progress` 是唯一的业务数据端点（可选云同步）。
 
@@ -216,7 +216,7 @@ curl -s -X PUT https://example.com/api/progress \
 
 ## 12. 环境变量与浏览器要求
 
-- 环境变量：核心页面**无需任何**即可运行；可选变量（`NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_GA_MEASUREMENT_ID` / Sentry DSN / `BLOB_READ_WRITE_TOKEN` + `BLOB_STORE_ID` / `ANALYZE` / `MAX_BUNDLE_KB` / `NEXT_DIST_DIR`）见 `.env.example` 与 [01-overview.md](01-overview.md) §7。运行期版本由 `next.config.mjs` 注入 `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_BUILD_ID`，不需手工配置。
+- 环境变量：核心页面**无需任何**即可运行；可选变量（`NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_GA_MEASUREMENT_ID` / Sentry DSN / `BLOB_HANZI_READ_WRITE_TOKEN` + `BLOB_HANZI_STORE_ID` / `ANALYZE` / `MAX_BUNDLE_KB` / `NEXT_DIST_DIR`）见 `.env.example` 与 [01-overview.md](01-overview.md) §7。运行期版本由 `next.config.mjs` 注入 `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_BUILD_ID`，不需手工配置。
 - 浏览器：Chrome / Firefox / Safari / Edge 最新两个主要版本；需启用 JavaScript、`localStorage`、Canvas 与（发音功能）Web Speech API。
 - 构建期联网资源：`next/font/google`（Google Fonts）。
 

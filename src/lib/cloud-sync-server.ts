@@ -4,15 +4,14 @@ import { get, put } from '@vercel/blob';
 import { parseProgressBackup, createProgressBackup } from '@/lib/progress-transfer';
 import { isEmptyProgress } from '@/lib/progress-utils';
 import { blobPath, MAX_BACKUP_BYTES } from '@/lib/cloud-sync';
+import { blobAuthOptions, blobConfigured } from '@/lib/blob-credentials';
 
 export type SyncResult =
   | { ok: true; backup?: string }
   | { ok: false; code: string; status: number };
 
-/** BLOB_STORE_ID 需配合 OIDC 才可用；独立 token 或显式启用 OIDC 时才视为已配置（S7）。 */
-export const syncConfigured = (): boolean =>
-  Boolean(process.env.BLOB_READ_WRITE_TOKEN) ||
-  Boolean(process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN);
+/** 云同步凭证是否就绪：读写令牌直接可用；仅 Store ID 时依赖 Vercel OIDC（S7）。 */
+export const syncConfigured = (): boolean => blobConfigured();
 
 const fail = (code: string, status: number): SyncResult => ({ ok: false, code, status });
 
@@ -34,7 +33,7 @@ export function rateLimit(key: string, now = Date.now()): boolean {
 
 export async function readCloudBackup(code: string): Promise<SyncResult> {
   try {
-    const file = await get(blobPath(code), { access: 'private' });
+    const file = await get(blobPath(code), { access: 'private', ...blobAuthOptions() });
     if (!file) return fail('not_found', 404);
     const length = Number(file.headers.get('content-length') ?? 0);
     if (length > MAX_BACKUP_BYTES) return fail('too_large', 413);
@@ -59,6 +58,7 @@ export async function writeCloudBackup(code: string, backup: string): Promise<Sy
       contentType: 'application/json',
       allowOverwrite: true,
       addRandomSuffix: false,
+      ...blobAuthOptions(),
     });
     return { ok: true };
   } catch {

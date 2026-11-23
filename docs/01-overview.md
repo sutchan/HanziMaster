@@ -124,7 +124,7 @@ HanziMaster/
 | `NEXT_PUBLIC_SITE_URL` | 站点绝对地址，用于 `metadataBase` / canonical / hreflang / sitemap；本地留空回退 `http://localhost:3000` | 生产部署必填 |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | GA4 衡量 ID；未设置完全不加载统计脚本，设置后仍需用户在同意横幅中选择「接受」 | 否 |
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Sentry 错误监控与 source maps 上传；未设置 DSN 时不启用、零开销 | 否（CI 构建需 AUTH_TOKEN 上传） |
-| `BLOB_READ_WRITE_TOKEN` / `BLOB_STORE_ID` | 可选云端进度同步：Vercel Blob 私有 store 的读写凭证与 store 标识；未配置时 `/api/progress` 返回 503，应用保持纯本地模式 | 否 |
+| `BLOB_HANZI_READ_WRITE_TOKEN` / `BLOB_HANZI_STORE_ID` | 可选云端进度同步：Vercel Blob 私有 store 的读写凭证与 store 标识（应用自有变量名，优先于 SDK 默认的 `BLOB_READ_WRITE_TOKEN` / `BLOB_STORE_ID`，后者仍兼容）；未配置时 `/api/progress` 返回 503，应用保持纯本地模式 | 否 |
 | `ANALYZE` | `ANALYZE=1 pnpm build` 生成 bundle 分析报告（写入框架构建目录 `.next/analyze/`，由 Next/Vercel 预设接管） | 否 |
 | `MAX_BUNDLE_KB` | 构建后产物体积门禁阈值（KB），由 `check-bundle-size.mjs` 读取 | 否 |
 | `NEXT_DIST_DIR` | 自定义构建输出目录，供并行预览/检查脚本隔离 `.next` 使用 | 否 |

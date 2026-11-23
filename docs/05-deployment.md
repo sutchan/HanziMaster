@@ -15,7 +15,7 @@
 
 - **运行时**：Node.js `>= 24.11.0`（`.nvmrc` 锁定 `24.11.0`），pnpm `>= 11`（`packageManager: pnpm@11.24.0`）。Vercel 的 Node 版本是**项目设置**，`vercel.json` 不支持 `nodeVersion` 键；`prebuild` 的 `scripts/check-runtime.mjs` 会在构建最早期校验 Node 版本并给出可操作错误。
 - **包管理器**：项目强制 pnpm（`preinstall: npx only-allow pnpm`，`.npmrc` 设 `engine-strict` / `package-manager-strict`）。开发者侧命令一律 `pnpm`；仅 `edgeone.json` 内的 `npm run build` 是构建平台内部命令，见 §3。
-- **环境变量**：核心页面运行**不需要任何环境变量**；生产建议配置 `NEXT_PUBLIC_SITE_URL`，可选启用 GA4 / Sentry / Vercel Blob 云同步（完整清单见 [01-overview.md](01-overview.md) §7）。`.env.local` 仅供本地可选配置，不提交仓库。
+- **环境变量**：核心页面运行**不需要任何环境变量**；生产建议配置 `NEXT_PUBLIC_SITE_URL`，可选启用 GA4 / Sentry / Vercel Blob 云同步（Blob 凭证用应用自有变量名 `BLOB_HANZI_STORE_ID` / `BLOB_HANZI_READ_WRITE_TOKEN`，完整清单见 [01-overview.md](01-overview.md) §7）。`.env.local` 仅供本地可选配置，不提交仓库。
 - **联网资源**：`next/font/google` 需访问 Google Fonts（Space Grotesk / Playfair Display / Noto Serif SC / JetBrains Mono）。离线/沙箱环境构建可能因字体下载失败，属环境限制而非代码缺陷，部署平台需允许该域名。
 - **安全响应头**：CSP、`X-Content-Type-Options`、`X-Frame-Options`、`Referrer-Policy`、`Permissions-Policy` 由 `next.config.mjs` 的 `headers()` 统一注入到所有路由，**不要在平台配置里重复定义或覆盖**。
 - **中间件**：`src/proxy.ts` 是 Next.js 16 的边缘中间件（URL 级 i18n 前缀协商与请求头注入，详见 [02-architecture.md](02-architecture.md) §2）；部署平台需支持 Next.js 中间件运行，不能按纯静态站点托管。
@@ -69,9 +69,10 @@
 
 1. 将代码推送到 Git 仓库。
 2. 在 EdgeOne Pages 控制台创建应用并关联仓库。
-3. 确认上述 `installCommand` / `buildCommand` / `nodeVersion` 生效；输出目录按平台 Next.js 预设（`.next`），不要改成静态站点目录。
-4. 触发部署，检查构建日志中字体下载与 CSP 响应头。
-5. 绑定自定义域名与 HTTPS（可选）。
+3. **在「环境变量 / Environment Variables」添加 `NEXT_PUBLIC_SITE_URL=https://<正式域名>`（必填，无尾斜杠、无 query/hash、无 path）**。`next.config.mjs` 在生产构建（含 EdgeOne 的 `npm run build`）会 fail-closed 校验：漏配或非法直接报 `NEXT_PUBLIC_SITE_URL must be a valid absolute http(s) URL...` 并退出 1，防止 canonical / hreflang / `sitemap.xml` / `robots.txt` 全部指向 `localhost`。`.env.local` 不入库、平台构建读不到，必须在控制台配置；示例报错中的 `https://hanzi.ewuse.com` 即当前正式域名。
+4. 确认上述 `installCommand` / `buildCommand` / `nodeVersion` 生效；输出目录按平台 Next.js 预设（`.next`），不要改成静态站点目录。
+5. 触发部署，检查构建日志中字体下载与 CSP 响应头。
+6. 绑定自定义域名与 HTTPS（可选）；若正式域名与步骤 3 的值不同，须同步更新该环境变量并重新构建。
 
 ### 3.1 安全响应头：权威源、兜底与线上核验（P1-32）
 
@@ -136,7 +137,7 @@ GitHub Actions 工作流（`.github/workflows/`）一览：
 - [ ] `pnpm build` 成功（`prebuild` 运行时门禁通过）
 - [ ] `node scripts/check-deploy-env.mjs --strict` 通过（平台侧由 `deploy.yml` 在 `vercel pull` 后自动执行）
 - [ ] 带 Sentry 变量的构建路径已在 Preview 验证（`SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_ORG` / `SENTRY_PROJECT` 同时设置时）
-- [ ] **生产环境变量 `NEXT_PUBLIC_SITE_URL=https://<正式域名>` 已配置**（P0-30，必填；漏配或非法会让生产构建直接失败，防止 canonical / hreflang / `sitemap.xml` / `robots.txt` 全指向 `http://localhost:3000`）
+- [ ] **生产环境变量 `NEXT_PUBLIC_SITE_URL=https://<正式域名>` 已在 Vercel / EdgeOne 控制台配置**（P0-30，必填；Vercel 在 Project Settings → Environment Variables，EdgeOne 在应用「环境变量」，见 §3 步骤 3。`.env.local` 不入库，平台构建读不到；漏配或非法会让生产构建直接失败，防止 canonical / hreflang / `sitemap.xml` / `robots.txt` 全指向 `http://localhost:3000`）
 - [ ] 部署后 SEO/GEO 线上核验（下列 `curl` 均不得出现 `localhost`，`/zh-CN` 首屏 HTML 的 `lang` 与文案须为中文）：
   ```bash
   curl -sSL https://<正式域名>/zh-CN | grep -iE '<html|canonical|hreflang|<h1'
