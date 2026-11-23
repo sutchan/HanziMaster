@@ -59,6 +59,9 @@ export default function PracticePage() {
       setShowWritingDialog(true);
     } else if (optionId === 'quiz') {
       setShowQuizDialog(true);
+    } else if (optionId === 'progress') {
+      // 「学习进度」卡定位到页面下方已有的统计区，而非仅改变选中态（F1）
+      document.getElementById('weekly-progress')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 

@@ -1,11 +1,12 @@
-// src/lib/i18n/translations/extensions/progress.ts v5.2.44
-// P2-17：进度导出/导入入口文案（11 语言齐全）。
+// src/lib/i18n/translations/extensions/progress.ts v5.2.59
+// 进度导出/导入入口与持久化失败提示文案（11 语言齐全）。
 
 export interface ProgressTexts {
   exportLabel: string;
   importLabel: string;
   importInvalid: string;
   importDone: string;
+  persistFailed: string;
 }
 
 export const progressByLocale: Record<string, ProgressTexts> = {
