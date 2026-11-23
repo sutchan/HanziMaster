@@ -98,7 +98,10 @@ if (dsn) {
     (strict ? errors : warnings).push(message);
     note('SENTRY_ORG/SENTRY_PROJECT', strict ? 'MISSING (strict)' : 'WARN');
   }
-  if (!env.NEXT_PUBLIC_SENTRY_DSN) warnings.push('SENTRY_DSN 已设置但 NEXT_PUBLIC_SENTRY_DSN 缺失，浏览器端不会上报');
+  // NEXT_PUBLIC_SENTRY_DSN 由 next.config.mjs 从 SENTRY_DSN 构建期注入，无需重复配置
+  if (env.NEXT_PUBLIC_SENTRY_DSN && env.NEXT_PUBLIC_SENTRY_DSN !== dsn) {
+    warnings.push('NEXT_PUBLIC_SENTRY_DSN 与 SENTRY_DSN 不一致，客户端以 next.config 注入值为准');
+  }
   if (!env.SENTRY_AUTH_TOKEN) warnings.push('SENTRY_AUTH_TOKEN 缺失，source map 不会上传（不阻断构建）');
 } else {
   note('SENTRY_DSN', 'OFF (optional)');

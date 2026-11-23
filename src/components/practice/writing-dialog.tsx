@@ -87,7 +87,7 @@ export function WritingDialog({ open, onOpenChange, character, strokeCount, onNe
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            {t('practice.strokeCount')}: {strokeCount}
+            {t('practice.strokeCount', { count: strokeCount })}
           </p>
 
           {accuracy !== null && (

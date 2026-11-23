@@ -79,6 +79,11 @@ export function QuizDialog({
               {correct ? t('learn.quizCorrect') : t('learn.quizIncorrect')}
             </div>
           )}
+          {correct === false && character && (
+            <p className="mt-2 text-center text-sm text-ink-600 dark:text-ink-300">
+              {t('practice.correctAnswer')}: {character.pinyin}（{character.hanzi}）
+            </p>
+          )}
         </div>
 
         <DialogFooter>

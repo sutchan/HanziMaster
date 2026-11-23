@@ -20,11 +20,14 @@ export function StrokeOrderDemo({ character, strokeCount }: StrokeOrderDemoProps
   const [data, setData] = useState<StrokeOrderData | null>(null);
   const [activeStroke, setActiveStroke] = useState(0); // 已显示的笔画数
   const [playing, setPlaying] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const totalStrokes = data?.strokes.length ?? strokeCount;
 
   useEffect(() => {
     let active = true;
     setData(null);
+    setLoadFailed(false);
     setActiveStroke(0);
     setPlaying(false);
     loadStrokeOrder(character)
@@ -32,13 +35,16 @@ export function StrokeOrderDemo({ character, strokeCount }: StrokeOrderDemoProps
         if (active) setData(loaded ?? null);
       })
       .catch(() => {
-        // 加载失败回退为空状态，下一次切换可重试；loader 已记录告警
-        if (active) setData(null);
+        // 加载失败时明确提示并提供重试，不再静默显示空笔画（F6）
+        if (active) {
+          setData(null);
+          setLoadFailed(true);
+        }
       });
     return () => {
       active = false;
     };
-  }, [character]);
+  }, [character, retryKey]);
 
   // 由 playing 驱动定时器，避免在 setState updater 内调用 setState
   useEffect(() => {
@@ -106,10 +112,20 @@ export function StrokeOrderDemo({ character, strokeCount }: StrokeOrderDemoProps
               </g>
             </svg>
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2">
               <span className="serif-font text-[76px] font-light text-ink-200 dark:text-ink-700">
                 {character}
               </span>
+              {loadFailed && (
+                <button
+                  id="stroke-order-retry"
+                  type="button"
+                  onClick={() => setRetryKey((k) => k + 1)}
+                  className="touch-target rounded-lg border border-ink-200 px-4 py-2 text-sm text-ink-600 dark:border-ink-700 dark:text-ink-300"
+                >
+                  {t('common.retry')}
+                </button>
+              )}
             </div>
           )}
         </div>

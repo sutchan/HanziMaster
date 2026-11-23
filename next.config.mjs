@@ -89,6 +89,8 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion,
     NEXT_PUBLIC_BUILD_ID: buildId,
+    // 单一来源：只配置 SENTRY_DSN 即可同时启用服务端与浏览器端上报（T7）
+    ...(process.env.SENTRY_DSN ? { NEXT_PUBLIC_SENTRY_DSN: process.env.SENTRY_DSN } : {}),
   },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

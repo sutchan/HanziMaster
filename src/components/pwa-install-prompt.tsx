@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/components/locale-provider';
+import { useToast } from '@/components/toast';
 import { Button } from '@/components/ui/button';
 import { safeGetItem, safeSetItem } from '@/lib/storage';
 import { BUILD_ID, APP_VERSION } from '@/lib/version';
@@ -17,6 +18,7 @@ const DISMISS_KEY = 'hanzi-master-pwa-dismissed';
 
 export function PwaInstallPrompt() {
   const { t } = useTranslation();
+  const toast = useToast();
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(true);
 
@@ -72,6 +74,9 @@ export function PwaInstallPrompt() {
             try {
               await installEvent.prompt();
               await installEvent.userChoice;
+            } catch {
+              // 浏览器拒绝 prompt() 或 userChoice 失败时不应产生 unhandled rejection（T5）
+              toast.error(t('common.errorDesc'));
             } finally {
               setInstallEvent(null);
             }

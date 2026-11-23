@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { PRIVACY_UPDATED, privacySections } from '@/content/privacy';
 import { resolveLocale } from '@/lib/request-locale';
+import { legalByLocale } from '@/lib/i18n/translations/extensions/legal';
 import { getPageSeo } from '@/lib/seo-metadata';
 import { localizedHref } from '@/lib/urls';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -14,14 +15,18 @@ export const generateMetadata = async (): Promise<Metadata> => getPageSeo('priva
 /** 静态合规页面：Server Component 渲染，双语并列，避免随界面语言切换缺漏。 */
 export default async function PrivacyPage() {
   const locale = resolveLocale(await headers());
+  const legal = legalByLocale[locale] ?? legalByLocale.en;
 
   return (
     <div id="privacy-page" className="mx-auto w-full max-w-3xl px-6 py-16">
       <Breadcrumbs locale={locale} path="/privacy" />
       <header id="privacy-page-header" className="mb-12">
-        <h1 className="text-3xl font-bold text-foreground">隐私政策</h1>
+        <h1 className="text-3xl font-bold text-foreground">{legal.privacyTitle}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {locale.startsWith('zh') ? 'English version below / 英文版见下' : '中文版本见下 / Chinese version below'}
+        </p>
         <p lang="en" className="mt-2 text-xl text-muted-foreground">
-          Privacy Policy
+          {legalByLocale.en.privacyTitle}
         </p>
         <p className="mt-4 text-sm text-muted-foreground">
           最后更新 / Last updated: {PRIVACY_UPDATED}
@@ -54,7 +59,7 @@ export default async function PrivacyPage() {
           href={localizedHref(locale, '/terms')}
           className="text-primary underline-offset-4 hover:underline"
         >
-          服务条款 / Terms of Service
+          {legal.termsLink} / {legalByLocale.en.termsLink}
         </Link>
       </footer>
     </div>
