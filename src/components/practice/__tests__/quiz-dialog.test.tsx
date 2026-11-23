@@ -118,7 +118,8 @@ describe('practice QuizDialog · 渲染与交互', () => {
   });
 
   it('advances and closes through the footer buttons', () => {
-    const { props } = renderDialog();
+    // 未作答时「下一题」为禁用态（F4），需在已作答状态下验证推进
+    const { props } = renderDialog({ answered: true, selectedAnswer: quizChar.hanzi });
     fireEvent.click(screen.getByRole('button', { name: en.practice.nextQuestion }));
     expect(props.onNext).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole('button', { name: en.common.cancel }));

@@ -10,7 +10,7 @@ import {
 
 const CODE = 'a'.repeat(32);
 const backup = JSON.stringify({
-  app: 'hanzi-master',
+  app: 'HanziMaster',
   version: 1,
   exportedAt: new Date().toISOString(),
   progress: {
@@ -58,7 +58,7 @@ describe('cloud-sync-server', () => {
 
   it('validates before overwriting and never writes empty progress', async () => {
     const empty = JSON.stringify({
-      app: 'hanzi-master', version: 1, exportedAt: new Date().toISOString(),
+      app: 'HanziMaster', version: 1, exportedAt: new Date().toISOString(),
       progress: { learnedCharIds: [], quizResults: [], dailyActivity: {}, streak: 0, accuracy: 0 },
     });
     expect((await writeCloudBackup(CODE, empty)).ok).toBe(false);

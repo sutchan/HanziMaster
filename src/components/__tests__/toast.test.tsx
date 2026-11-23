@@ -38,7 +38,8 @@ describe('ToastProvider', () => {
     act(() => emit!.success('保存成功'));
 
     expect(await screen.findByText('保存成功')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    // 成功/提示类走 status（polite），仅错误走 alert（assertive），避免读屏打断
+    expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: closeLabel })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: closeLabel }));
@@ -55,6 +56,8 @@ describe('ToastProvider', () => {
     expect(await screen.findByText('错误')).toBeInTheDocument();
     expect(screen.getByText('注意')).toBeInTheDocument();
     expect(screen.getByText('提示')).toBeInTheDocument();
+    // 仅错误类使用 assertive 的 alert 角色
+    expect(screen.getByRole('alert')).toHaveTextContent('错误');
   });
 
   it('keeps separate provider instances isolated', async () => {
