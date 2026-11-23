@@ -16,6 +16,12 @@ export interface ProgressData {
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 const DAY_MS = 86_400_000;
 
+/** 统一的「空进度」判定：客户端、导入迁移与 API 共用，避免三处规则漂移。 */
+export const isEmptyProgress = (p: ProgressData): boolean =>
+  p.learnedCharIds.length === 0 &&
+  p.quizResults.length === 0 &&
+  Object.keys(p.dailyActivity).length === 0;
+
 export const getDefaultProgress = (): ProgressData => ({
   learnedCharIds: [],
   quizResults: [],

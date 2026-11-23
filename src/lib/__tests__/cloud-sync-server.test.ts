@@ -75,8 +75,12 @@ describe('cloud-sync-server', () => {
   it('reports config state and maps error codes to messages', () => {
     expect(syncConfigured()).toBe(true);
     vi.stubEnv('BLOB_READ_WRITE_TOKEN', '');
-    vi.stubEnv('BLOB_STORE_ID', '');
+    vi.stubEnv('BLOB_STORE_ID', 'store-id');
+    vi.stubEnv('VERCEL_OIDC_TOKEN', '');
     expect(syncConfigured()).toBe(false);
+    vi.stubEnv('VERCEL_OIDC_TOKEN', 'oidc-token');
+    expect(syncConfigured()).toBe(true);
+    vi.stubEnv('BLOB_STORE_ID', '');
     expect(syncErrorMessage('rate_limited')).toBe('Too many requests');
     expect(syncErrorMessage('unknown')).toContain('failed');
   });

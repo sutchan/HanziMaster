@@ -2,25 +2,19 @@
 // 云同步服务端逻辑：仅服务端引入 @vercel/blob；限流 + 读写备份，与路由层分离便于单测。
 import { get, put } from '@vercel/blob';
 import { parseProgressBackup, createProgressBackup } from '@/lib/progress-transfer';
+import { isEmptyProgress } from '@/lib/progress-utils';
 import { blobPath, MAX_BACKUP_BYTES } from '@/lib/cloud-sync';
 
 export type SyncResult =
   | { ok: true; backup?: string }
   | { ok: false; code: string; status: number };
 
+/** BLOB_STORE_ID 需配合 OIDC 才可用；独立 token 或显式启用 OIDC 时才视为已配置（S7）。 */
 export const syncConfigured = (): boolean =>
-  Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+  Boolean(process.env.BLOB_READ_WRITE_TOKEN) ||
+  Boolean(process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN);
 
 const fail = (code: string, status: number): SyncResult => ({ ok: false, code, status });
-
-const isEmpty = (p: {
-  learnedCharIds: unknown[];
-  quizResults: unknown[];
-  dailyActivity: object;
-}): boolean =>
-  p.learnedCharIds.length === 0 &&
-  p.quizResults.length === 0 &&
-  Object.keys(p.dailyActivity).length === 0;
 
 /** 简化令牌桶：按同步码限制每窗口请求数。Serverless 多实例下为尽力而为，非强一致。 */
 const WINDOW_MS = 60_000;
@@ -47,7 +41,7 @@ export async function readCloudBackup(code: string): Promise<SyncResult> {
     const raw = await new Response(file.stream).text();
     if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) return fail('too_large', 413);
     const progress = parseProgressBackup(raw);
-    if (isEmpty(progress)) return fail('empty_backup', 502);
+    if (isEmptyProgress(progress)) return fail('empty_backup', 502);
     return { ok: true, backup: raw };
   } catch {
     return fail('read_failed', 502);
@@ -57,7 +51,7 @@ export async function readCloudBackup(code: string): Promise<SyncResult> {
 export async function writeCloudBackup(code: string, backup: string): Promise<SyncResult> {
   try {
     const progress = parseProgressBackup(backup);
-    if (isEmpty(progress)) return fail('empty_progress', 400);
+    if (isEmptyProgress(progress)) return fail('empty_progress', 400);
     const serialized = createProgressBackup(progress);
     if (new TextEncoder().encode(serialized).length > MAX_BACKUP_BYTES) return fail('too_large', 413);
     await put(blobPath(code), serialized, {

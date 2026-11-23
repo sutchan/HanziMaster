@@ -10,6 +10,7 @@ import {
   computeStreak,
   computeWeeklyActivity,
   getDefaultProgress,
+  isEmptyProgress,
   toLocalDateStr,
   validateProgress,
 } from '@/lib/progress-utils';
@@ -41,11 +42,7 @@ export function useProgress() {
   useEffect(() => {
     if (!loaded) return;
     // 空进度时删除键：否则「重置学习进度」后又被写回默认快照，存储键永久残留
-    const isEmpty =
-      progress.learnedCharIds.length === 0 &&
-      progress.quizResults.length === 0 &&
-      Object.keys(progress.dailyActivity).length === 0;
-    if (isEmpty) {
+    if (isEmptyProgress(progress)) {
       safeRemoveItem(PROGRESS_STORAGE_KEY);
       setPersistError(false);
       return;

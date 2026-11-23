@@ -1,7 +1,7 @@
 // src/lib/progress-transfer.ts v5.2.58
 // P2-17：学习进度 JSON 备份（导出 / 导入 / 严格校验 / v0 迁移），纯函数不触碰 localStorage。
 
-import { getDefaultProgress, validateProgress, type ProgressData } from './progress-utils';
+import { getDefaultProgress, isEmptyProgress, validateProgress, type ProgressData } from './progress-utils';
 import { MAX_BACKUP_BYTES } from './cloud-sync';
 
 // 上限唯一来源为 cloud-sync.ts，保持客户端导出 / 导入 / API 路由三处口径一致
@@ -67,12 +67,5 @@ export function parseProgressBackup(raw: string): ProgressData {
   }
 
   const clean = validateProgress(progress);
-  if (
-    clean.learnedCharIds.length === 0 &&
-    clean.quizResults.length === 0 &&
-    Object.keys(clean.dailyActivity).length === 0
-  ) {
-    return getDefaultProgress();
-  }
-  return clean;
+  return isEmptyProgress(clean) ? getDefaultProgress() : clean;
 }

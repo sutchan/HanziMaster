@@ -71,12 +71,14 @@ const applyDocumentLocale = (value: Locale): void => {
   syncMetadataLocale(value);
 };
 
-/** 语言写入 URL 前缀（P1-9）：保留当前页面段，去掉旧的 ?lang=，URL 可分享可索引。 */
+/** 语言写入 URL 前缀：用 pushState 保留切换历史，浏览器后退可回到原语言（U5）。 */
 const syncUrlLocale = (value: Locale): void => {
   const url = new URL(window.location.href);
   url.href = withLocale(url.toString(), value);
   url.searchParams.delete('lang');
-  window.history.replaceState(null, '', url.toString());
+  const next = url.toString();
+  if (next === window.location.href) return;
+  window.history.pushState({ locale: value }, '', next);
 };
 
 export function LocaleProvider({
@@ -100,6 +102,19 @@ export function LocaleProvider({
     // URL / cookie 胜出时同步回写存储，避免三处状态分叉导致后续页面语言跳变
     safeSetItem(storageKey, initial);
   }, [storageKey, defaultLocale]);
+
+  // 浏览器后退/前进时按 URL 前缀恢复语言（U5）
+  useEffect(() => {
+    const onPopState = () => {
+      const fromUrl = getUrlLocale();
+      if (fromUrl) {
+        setLocaleState(fromUrl);
+        applyDocumentLocale(fromUrl);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // P1-11：只按需加载当前语言词典；SSR 预载时直接复用，切回默认语言也恢复预载词典。
   useEffect(() => {
