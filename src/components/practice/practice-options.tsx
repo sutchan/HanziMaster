@@ -20,7 +20,7 @@ export function PracticeOptionsGrid({ selectedOption, onSelect }: PracticeOption
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-            className={`group bg-card/80 dark:bg-ink-900/80 backdrop-blur-sm p-10 rounded-3xl border-2 border-ink-100 dark:border-ink-800 hover:border-primary-border hover:-translate-y-2 hover:shadow-ink-lg transition-[colors,transform,box-shadow] duration-300 text-left ${
+            className={`group bg-card/80 dark:bg-ink-900/80 backdrop-blur-sm p-10 rounded-3xl border-2 border-ink-100 dark:border-ink-800 hover:border-primary-border hover:-translate-y-2 hover:shadow-ink-lg transition-[colors,transform,box-shadow] duration-300 text-start ${
               isSelected ? 'border-vermilion-500 shadow-vermilion-glow' : ''
             }`}
           >

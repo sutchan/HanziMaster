@@ -1,6 +1,7 @@
 // src/components/practice/weekly-progress.tsx v5.2.57
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslation } from '@/components/locale-provider';
 import { StatsCard } from '@/components/stats-card';
 import { icons, weekDays } from '@/components/practice/practice-assets';
@@ -20,8 +21,11 @@ export function WeeklyProgress({
 }: WeeklyProgressProps) {
   const { t } = useTranslation();
 
-  // weekDays 以周一为索引 0；JS getDay() 以周日为 0，需做偏移映射
-  const todayIndex = (new Date().getDay() + 6) % 7;
+  // 服务端/客户端时区与跨午夜差异会导致 hydration mismatch：首帧固定周一，挂载后再校正（T8）
+  const [todayIndex, setTodayIndex] = useState(0);
+  useEffect(() => {
+    setTodayIndex((new Date().getDay() + 6) % 7);
+  }, []);
 
   return (
     <div id="weekly-progress" className="bg-card/80 dark:bg-ink-900/80 backdrop-blur-xl rounded-4xl p-10 border border-ink-100 dark:border-ink-800 reveal shadow-ink-lg">

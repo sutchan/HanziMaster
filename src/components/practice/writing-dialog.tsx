@@ -66,7 +66,7 @@ export function WritingDialog({ open, onOpenChange, character, strokeCount, onNe
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-vermilion-50">
               <span className="font-serif text-3xl text-vermilion-600">{character.hanzi}</span>
             </div>
-            <div className="text-left">
+            <div className="text-start">
               <Badge variant="outline" className="border-vermilion-200 text-vermilion-700">
                 {character.pinyin}
               </Badge>

@@ -51,7 +51,7 @@ export function ThemeToggleClient({ id = 'theme-toggle' }: { id?: string }) {
       {themeIcons[theme] || themeIcons.system}
 
       {/* Tooltip：物理 left 居中兼容 RTL；键盘聚焦时同样可见 */}
-      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-ink-800 dark:bg-ink-100 text-ink-50 dark:text-ink-900 text-[10px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity pointer-events-none whitespace-nowrap hidden sm:block">
+      <span className="absolute -bottom-8 start-1/2 -translate-x-1/2 bg-ink-800 dark:bg-ink-100 text-ink-50 dark:text-ink-900 text-[10px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity pointer-events-none whitespace-nowrap hidden sm:block">
         {t(`common.theme.${theme}`)}
       </span>
     </button>

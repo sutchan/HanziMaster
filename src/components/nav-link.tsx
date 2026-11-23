@@ -29,7 +29,7 @@ export function NavLink({ href, children }: NavLinkProps) {
       {/* Active underline + hover reveal（平滑下划线动画） */}
       <span
         aria-hidden="true"
-        className={`absolute bottom-0 start-3 end-3 h-0.5 rounded-full bg-vermilion-500 origin-left transition-transform duration-300 ease-out ${
+        className={`absolute bottom-0 start-3 end-3 h-0.5 rounded-full bg-vermilion-500 origin-start transition-transform duration-300 ease-out ${
           isActive
             ? 'scale-x-100'
             : 'scale-x-0 group-hover:scale-x-50 group-hover:bg-vermilion-500/40'
