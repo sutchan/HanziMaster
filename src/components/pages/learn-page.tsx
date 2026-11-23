@@ -9,6 +9,9 @@ import { usePronunciation } from '@/hooks/use-pronunciation';
 import { useHaptic } from '@/hooks/use-haptic';
 import { useProgress } from '@/hooks/use-progress';
 import { characters } from '@/lib/characters';
+import { safeGetItem, trySetItem } from '@/lib/storage';
+
+const SELECTED_CHAR_KEY = 'hanzi-master-selected-char';
 import { CharacterGrid } from '@/components/learn/character-grid';
 import { CharacterDetail } from '@/components/learn/character-detail';
 import dynamic from 'next/dynamic';
@@ -31,6 +34,17 @@ export default function LearnPage() {
   const [quizAnswer, setQuizAnswer] = useState('');
   const [quizCorrect, setQuizCorrect] = useState<boolean | null>(null);
   const autoCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 选择状态持久化：刷新后保留上次学习的字，否则总回到第 1 字（F7）
+  useEffect(() => {
+    const saved = safeGetItem<unknown>(SELECTED_CHAR_KEY, null);
+    if (typeof saved === 'number' && characters.some((c) => c.id === saved)) {
+      setSelectedCharacterId(saved);
+    }
+  }, []);
+  useEffect(() => {
+    if (selectedCharacterId !== null) trySetItem(SELECTED_CHAR_KEY, selectedCharacterId);
+  }, [selectedCharacterId]);
 
   const selectedCharacter = characters.find((c) => c.id === selectedCharacterId) || null;
   const currentIndex = Math.max(0, characters.findIndex((c) => c.id === selectedCharacterId));
@@ -112,6 +126,12 @@ export default function LearnPage() {
             </p>
           </div>
         </div>
+
+        {progress.persistError && (
+          <p id="learn-persist-error" role="alert" className="mb-6 rounded-lg bg-destructive/10 p-3 text-center text-sm text-destructive">
+            {t('progress.persistFailed')}
+          </p>
+        )}
 
         <CharacterGrid selectedId={selectedCharacterId} onSelect={setSelectedCharacterId} />
 
