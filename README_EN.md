@@ -1,4 +1,4 @@
-﻿# HanziMaster 汉字大师 v5.2.59
+﻿# HanziMaster 汉字大师 v5.2.60
 
 [English](README_EN.md) | [简体中文](README.md)
 
@@ -11,7 +11,7 @@
 ![i18n](https://img.shields.io/badge/i18n-11%20Locales-8A2BE2)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING_EN.md)
 
-HanziMaster is a Chinese character learning app that helps you master handwriting through guided practice, stroke-order demonstrations, and immersive review. It is purely client-side and local-first: progress is stored in browser localStorage, with no accounts and no backend API.
+HanziMaster is a local-first app built around **practicing Chinese character writing**: follow stroke-order demos, write by hand in Tian-zi-ge grids, and reinforce with pinyin quizzes. Purely client-side: progress is stored in browser localStorage, with no accounts and no backend API.
 
 ## Preview
 
@@ -184,4 +184,4 @@ Character data, pinyin, examples, stroke-order animations and structure hints ar
 
 Released under the [MIT License](LICENSE); third-party dependency licenses are listed in [NOTICE](NOTICE). Contribution and security guidelines: [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md), [SECURITY.md](.github/SECURITY.md), [SUPPORT.md](.github/SUPPORT.md), [PR template](.github/PULL_REQUEST_TEMPLATE.md).
 
-© 2026 HanziMaster 汉字大师 v5.2.59
+© 2026 HanziMaster 汉字大师 v5.2.60

@@ -1,7 +1,7 @@
 {
-  "name": "HanziMaster 汉字大师 v5.2.59",
-  "version": "5.2.59",
-  "description": "v5.2.58: 修复 Vercel 部署审计全部代码/配置问题——Sentry v11 导入路径、proxy 社交图路由、部署环境变量与 Secrets 门禁、Release skip 拦截、Vercel 构建/缓存配置、4MB 备份上限与运行时门禁；剩余平台动作见 docs/vercel-deployment-audit.md。",
+  "name": "HanziMaster 汉字大师 v5.2.60",
+  "version": "5.2.60",
+  "description": "v5.2.60: 产品定位对齐「练习写汉字」——11 语言首页文案从「精通中文」改为练字主线，主 CTA 直达 /practice 书写练习、次 CTA 指向 /learn 字库；README 与项目文档定位同步。",
   "keywords": [
     "Chinese characters",
     "Hanzi",

@@ -1,4 +1,4 @@
-﻿# HanziMaster 汉字大师 v5.2.59
+﻿# HanziMaster 汉字大师 v5.2.60
 
 [English](README_EN.md) | [简体中文](README.md)
 
@@ -11,7 +11,7 @@
 ![i18n](https://img.shields.io/badge/i18n-11%20%E8%AF%AD%E8%A8%80-8A2BE2)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-一款汉字学习应用，通过引导式练习、笔顺展示与沉浸式复习帮助你掌握汉字书写。纯前端、本地优先：进度保存在浏览器 localStorage，无账户、无后端 API。
+一款以**练习写汉字**为核心的本地优先应用：跟随笔顺演示，在田字格里手写练习，再用拼音测验巩固。纯前端：进度保存在浏览器 localStorage，无账户、无后端 API。
 
 ## 预览
 
@@ -184,4 +184,4 @@ CSP 与安全响应头由 `next.config.mjs` 的 `headers()` 统一注入；`src/
 
 本项目按 [MIT 许可证](LICENSE) 发布；第三方依赖许可见 [NOTICE](NOTICE)。贡献与安全报告流程见 [CONTRIBUTING.md](CONTRIBUTING.md)、[CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md)、[SECURITY.md](.github/SECURITY.md)、[SUPPORT.md](.github/SUPPORT.md) 与 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md)。
 
-© 2026 HanziMaster 汉字大师 v5.2.59
+© 2026 HanziMaster 汉字大师 v5.2.60

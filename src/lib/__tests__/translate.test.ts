@@ -1,4 +1,4 @@
-// src/lib/__tests__/translate.test.ts v5.2.50
+// src/lib/__tests__/translate.test.ts v5.2.60
 import { describe, it, expect } from 'vitest';
 import { getNestedValue, interpolate } from '@/lib/i18n/translate';
 import { locales, translations } from '@/lib/i18n';
@@ -6,7 +6,7 @@ import { en } from '@/lib/i18n/translations/en';
 
 describe('getNestedValue', () => {
   it('读取已有点分路径', () => {
-    expect(getNestedValue(en, 'home.heroTitle')).toBe('Master Chinese');
+    expect(getNestedValue(en, 'home.heroTitle')).toBe('Practice Writing Chinese');
   });
 
   it('键不存在时原样返回路径', () => {

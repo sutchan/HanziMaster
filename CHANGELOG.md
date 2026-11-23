@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## [5.2.60] - 产品定位对齐「练习写汉字」
+### Changed
+- **首页文案（11 语言）**：`home.heroTitle` 从「精通中文 / Master Chinese」改为「练习写汉字 / Practice Writing Chinese」；`home.aiBadge` 改为「田字格书写练习」；`home.heroDescription` 改为笔顺演示 → 田字格手写 → 拼音测验的练字主线；`home.aiInsightsTitle/Desc` 改为「笔顺演示」，`home.featuresTitle/Subtitle` 改为练字功能描述；`common.startLearning` 改为「开始练字 / Start Writing Practice」。文案长度均受 160 字符门禁约束。
+- **首页 CTA**：主按钮跳转从 `/learn` 改为 `/practice`（直达书写练习），文案沿用 `common.startLearning`；次按钮从通用 `common.practice` 改为 `common.exploreLibrary`（浏览字库）并指向 `/learn`。
+- **文档定位**：`README.md` / `README_EN.md` / `docs/01-overview.md` / `docs/project.md` 的产品描述统一为以「练习写汉字」为核心、笔顺演示 → 田字格手写 → 拼音测验的本地优先应用。
+
+### Test
+- `translate.test.ts` 的 `home.heroTitle` 断言更新为 `Practice Writing Chinese`；11 语言键完整性与 i18n 门禁保持通过。
+
 ## [5.2.59] - 云同步 Blob 凭证改用应用自有环境变量名
 ### Changed
 - **Blob 凭证映射**：新增 `src/lib/blob-credentials.ts`，把应用自有变量名 `BLOB_HANZI_STORE_ID` / `BLOB_HANZI_READ_WRITE_TOKEN` 显式传给 `@vercel/blob`（`token` / `storeId` 选项）。SDK 默认只读 `BLOB_READ_WRITE_TOKEN` / `BLOB_STORE_ID`，不显式传入时自定义变量名不会生效；空值一律不传，避免被静默回退。SDK 默认名保留为回退，旧部署不受影响。

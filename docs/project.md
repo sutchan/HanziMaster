@@ -1,12 +1,12 @@
 # Project Context
 
-> Document version: v5.2.50 (single source of truth: `package.json`)
+> Document version: v5.2.60 (single source of truth: `package.json`)
 
 This file is the English project context consumed by AI tooling. It is a **summary only**: the authoritative rules live in [coding-standards.md](coding-standards.md), [commit-template.md](commit-template.md), [git-workflow.md](git-workflow.md) and [index.md](index.md). If this file conflicts with them, fix this file.
 
 ## Purpose
 
-HanziMaster (汉字大师) is a local-first Chinese character learning web app: guided practice, stroke-order demonstrations, Tian-zi-ge Canvas writing, pinyin quizzes and progress tracking. It has 11 languages, dark/light/system themes and a responsive interface. No accounts, no backend API, no cloud sync, no AI service.
+HanziMaster (汉字大师) is a local-first web app centered on **practicing Chinese character writing**: stroke-order demonstrations, Tian-zi-ge Canvas handwriting practice, pinyin quizzes and progress tracking, backed by a 12-character library. It has 11 languages, dark/light/system themes and a responsive interface. No accounts, no backend API, no cloud sync, no AI service.
 
 ## Tech Stack
 

@@ -1,4 +1,4 @@
-// src/components/pages/home-page.tsx v5.2.52
+// src/components/pages/home-page.tsx v5.2.60
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -47,10 +47,10 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-xl bg-vermilion-500 text-primary-foreground hover:bg-vermilion-600">
-                <Link href={localizedHref(locale, '/learn')}>{t('common.startLearning')}</Link>
+                <Link href={localizedHref(locale, '/practice')}>{t('common.startLearning')}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-xl border-ink-200 dark:border-ink-700">
-                <Link href={localizedHref(locale, '/practice')}>{t('common.practice')}</Link>
+                <Link href={localizedHref(locale, '/learn')}>{t('common.exploreLibrary')}</Link>
               </Button>
             </div>
             <p className="mt-4 text-xs text-ink-500 dark:text-ink-400">{t('home.heroTrust')}</p>
