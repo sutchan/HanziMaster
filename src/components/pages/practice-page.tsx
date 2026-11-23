@@ -125,6 +125,12 @@ export default function PracticePage() {
           </p>
         </div>
 
+        {progress.persistError && (
+          <p id="practice-persist-error" role="alert" className="mb-6 rounded-lg bg-destructive/10 p-3 text-center text-sm text-destructive">
+            {t('progress.persistFailed')}
+          </p>
+        )}
+
         <PracticeOptionsGrid selectedOption={selectedOption} onSelect={handlePracticeOption} />
 
         <WeeklyProgress
