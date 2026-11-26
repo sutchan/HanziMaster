@@ -34,7 +34,6 @@ export interface AnimationPaintCache {
 let themeVersion = 0;
 let observer: MutationObserver | null = null;
 let mediaQuery: MediaQueryList | null = null;
-let cached: { key: string; version: number; paint: AnimationPaint } | null = null;
 
 const bumpVersion = () => {
   themeVersion += 1;
@@ -67,7 +66,6 @@ export const disposeAnimationCache = () => {
   observer = null;
   if (mediaQuery) mediaQuery.removeEventListener?.('change', bumpVersion);
   mediaQuery = null;
-  cached = null;
 };
 
 const buildPaint = (input: AnimationPaintInput): AnimationPaint => {
@@ -86,22 +84,26 @@ const buildPaint = (input: AnimationPaintInput): AnimationPaint => {
   };
 };
 
-/** 创建一次动画的缓存句柄：版本或输入变化时重建，否则直达缓存对象。 */
+/** 创建一次动画的缓存句柄：缓存归句柄所有，多个动画并行时不会互相覆盖。 */
 export function createAnimationPaintCache(input: AnimationPaintInput): AnimationPaintCache {
   ensureThemeObserver();
-  const key = JSON.stringify([
-    input.character,
-    input.width,
-    input.height,
-    input.strokePaths,
-    [...input.completed].sort((a, b) => a - b),
-  ]);
+  // 缓存条目按输入签名与主题版本号双重校验；completed 是活引用，集合变化也能触发重建。
+  const signature = () =>
+    JSON.stringify([
+      input.character,
+      input.width,
+      input.height,
+      input.strokePaths,
+      [...input.completed].sort((a, b) => a - b),
+    ]);
+  let entry: { key: string; version: number; paint: AnimationPaint } | null = null;
   return {
     read: () => {
       const current = getThemeVersion();
-      if (cached && cached.key === key && cached.version === current) return cached.paint;
+      const key = signature();
+      if (entry && entry.key === key && entry.version === current) return entry.paint;
       const paint = buildPaint(input);
-      cached = { key, version: current, paint };
+      entry = { key, version: current, paint };
       return paint;
     },
   };

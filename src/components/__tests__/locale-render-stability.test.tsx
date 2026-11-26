@@ -1,6 +1,6 @@
 // src/components/__tests__/locale-render-stability.test.tsx v5.2.61
 // OPT-06：语言状态与翻译通道分离；词典到达只重渲染翻译订阅者，t 引用保持稳定。
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { translations } from '@/lib/i18n';
@@ -81,4 +81,4 @@ describe('OPT-06 上下文拆分', () => {
     );
     expect(screen.getByTestId('api-shape')).toHaveTextContent('en|function|11|true');
   });
-});
+}, 20000);

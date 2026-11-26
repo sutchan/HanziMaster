@@ -65,7 +65,7 @@ function ToastItem({ id, message, type, duration = 5000, onRemove }: Toast & { o
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startExit = useCallback(() => {
-    setExitClass(getDirectionDelta(itemRef.current) === 1 ? '-translate-x-full' : 'translate-x-full');
+    setExitClass(getDirectionDelta(itemRef.current) === 1 ? 'translate-x-full' : '-translate-x-full');
     setIsExiting(true);
     if (exitTimer.current) clearTimeout(exitTimer.current);
     exitTimer.current = setTimeout(() => onRemove(id), 300);

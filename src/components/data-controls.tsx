@@ -1,4 +1,4 @@
-// src/components/data-controls.tsx v5.2.52
+// src/components/data-controls.tsx v5.2.61
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { CloudSyncControls } from '@/components/cloud-sync-controls';
 import { sectionTitle } from '@/components/settings-dialog-parts';
 import { safeRemoveItem } from '@/lib/storage';
 import { PROGRESS_IMPORTED_EVENT, PROGRESS_STORAGE_KEY } from '@/hooks/use-progress';
+import { useSyncedStorage } from '@/hooks/useSyncedStorage';
 
 /** 设置面板「数据」分区：进度导入导出、云同步与带二次确认的重置。 */
 export function DataControls() {
@@ -17,6 +18,14 @@ export function DataControls() {
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
   const restoreFocus = useRef(false);
+  // OPT-08：进度被别的标签页/组件重置或导入时，撤销本面板的二次确认态
+  const { revision: progressRevision } = useSyncedStorage<unknown>(PROGRESS_STORAGE_KEY, null, {
+    events: [PROGRESS_IMPORTED_EVENT],
+  });
+
+  useEffect(() => {
+    if (progressRevision > 0) setConfirmReset(false);
+  }, [progressRevision]);
 
   useEffect(() => {
     if (confirmReset || !restoreFocus.current) return;

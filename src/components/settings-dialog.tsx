@@ -7,7 +7,8 @@ import { useTheme, type Theme } from '@/components/theme-provider';
 import { useLocale } from '@/components/locale-provider';
 import { localeNames } from '@/components/locale-toggle';
 import { useToast } from '@/components/toast';
-import { loadSettings, saveSettings, DEFAULT_SETTINGS, type AppSettings } from '@/lib/settings';
+import { normalizeSettings, DEFAULT_SETTINGS, type AppSettings } from '@/lib/settings';
+import { APP_SYNC_EVENTS, SYNCED_KEYS, useSyncedStorage } from '@/hooks/useSyncedStorage';
 import { getDirectionDelta } from '@/lib/direction';
 import { SwitchRow, sectionTitle } from '@/components/settings-dialog-parts';
 import { DataControls } from '@/components/data-controls';
@@ -26,24 +27,24 @@ export function SettingsButton({ id = 'settings-open' }: { id?: string }) {
   const { theme, setTheme } = useTheme();
   const toast = useToast();
   const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  // OPT-08：设置状态走统一同步 hook，打开面板无需重读，跨标签/同页实例变更即时反映
+  const settingsSync = useSyncedStorage<AppSettings>(SYNCED_KEYS.settings, DEFAULT_SETTINGS, {
+    validate: normalizeSettings,
+    events: APP_SYNC_EVENTS,
+  });
+  const settings = settingsSync.value;
 
   useEffect(() => {
-    applyReduceMotion(loadSettings().reduceMotion);
-  }, []);
-
-  useEffect(() => {
-    if (open) setSettings(loadSettings());
-  }, [open]);
+    applyReduceMotion(settings.reduceMotion);
+  }, [settings.reduceMotion]);
 
   const update = (patch: Partial<AppSettings>) => {
     const next = { ...settings, ...patch };
     // 存储不可用时（隐私模式 / 配额耗尽）不更新 UI，避免显示「已保存」的假象
-    if (!saveSettings(next)) {
+    if (!settingsSync.setValue(next)) {
       toast.error(t('common.errorDesc'));
       return;
     }
-    setSettings(next);
     if (patch.reduceMotion !== undefined) applyReduceMotion(next.reduceMotion);
   };
 

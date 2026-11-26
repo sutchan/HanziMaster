@@ -35,7 +35,11 @@ export function prepareMedian(median: number[][], size: number): PreparedMedian 
 export function scanMedian(points: CanvasPoint[], prepared: PreparedMedian): Projection[] {
   const { pts } = prepared;
   return points.map((p) => {
-    let best: Projection = { along: 0, dist: Infinity };
+    // along 只在非退化段上选最近投影（与旧 projectOnMedian 一致）；
+    // dist 统计所有段（与旧 distToSegment 回退一致），两者在同一循环中得出。
+    let bestAlong = 0;
+    let bestAlongDist = Infinity;
+    let bestDist = Infinity;
     let along = 0;
     for (let i = 0; i < pts.length - 1; i++) {
       const a = pts[i];
@@ -46,16 +50,20 @@ export function scanMedian(points: CanvasPoint[], prepared: PreparedMedian): Pro
       if (len === 0) {
         // 退化段按端点距离处理，与 distToSegment 的旧口径一致
         const d = Math.hypot(p.x - a.x, p.y - a.y);
-        if (d < best.dist) best = { along, dist: d };
+        if (d < bestDist) bestDist = d;
         continue;
       }
       const raw = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (len * len);
       const t = Math.max(0, Math.min(1, raw));
       const d = Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
-      if (d < best.dist) best = { along: along + t * len, dist: d };
+      if (d < bestAlongDist) {
+        bestAlongDist = d;
+        bestAlong = along + t * len;
+      }
+      if (d < bestDist) bestDist = d;
       along += len;
     }
-    return best;
+    return { along: bestAlong, dist: bestDist };
   });
 }
 

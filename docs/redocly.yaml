@@ -1,0 +1,13 @@
+# docs/redocly.yaml v5.2.61
+# OpenAPI 机器校验配置：沿用 recommended 规则集，仅关闭与本项目设计相符的 4 条规则。
+extends:
+  - recommended
+rules:
+  # 公开探针与事实摘要无需鉴权；进度同步使用请求体同步码，不是标准 securityScheme
+  security-defined: off
+  # 本地开发服务器地址是规范中刻意保留的示例
+  no-server-example.com: off
+  # 健康探针恒定 200；新版进度端点始终可返回错误，无需刻意补 4XX
+  operation-4xx-response: off
+  # 旧版 GET /api/progress 已永久关闭，只返回 405，不存在 2XX
+  operation-2xx-response: off

@@ -39,7 +39,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "tmp/next-seo-check/types/**/*.ts",
-    "tmp/next-seo-check/dev/types/**/*.ts"
+    "tmp/next-seo-check/dev/types/**/*.ts",
+    "tmp/next-e2e/types/**/*.ts",
+    "tmp/next-e2e/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

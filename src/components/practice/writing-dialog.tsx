@@ -1,14 +1,15 @@
-// src/components/practice/writing-dialog.tsx v5.2.44
+// src/components/practice/writing-dialog.tsx v5.2.61
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from '@/components/locale-provider';
 import type { CharacterQuiz } from '@/components/practice/practice-assets';
 import { WritingCanvas, type WritingCanvasHandle } from '@/components/practice/writing-canvas';
+import { ErrorState } from '@/components/state/state-views';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { loadStrokeOrder } from '@/lib/stroke-order-loader';
-import type { StrokeOrderData } from '@/lib/character-types';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface WritingDialogProps {
@@ -24,25 +25,13 @@ export function WritingDialog({ open, onOpenChange, character, strokeCount, onNe
   const canvasRef = useRef<WritingCanvasHandle>(null);
   // 描红整体准确度（0-1），由 WritingCanvas 跟写判定后回调
   const [accuracy, setAccuracy] = useState<number | null>(null);
-  const [strokeData, setStrokeData] = useState<StrokeOrderData | null>(null);
-
-  // 笔顺数据按需加载：打开弹窗/切换字符时才拉取对应 chunk（P1-12）
-  useEffect(() => {
-    if (!open) return;
-    let active = true;
-    setStrokeData(null);
-    loadStrokeOrder(character.hanzi)
-      .then((data) => {
-        if (active) setStrokeData(data ?? null);
-      })
-      .catch(() => {
-        // 加载失败保持空状态，下一次打开可重试；loader 已记录告警
-        if (active) setStrokeData(null);
-      });
-    return () => {
-      active = false;
-    };
-  }, [open, character.hanzi]);
+  // 笔顺数据按需加载：打开弹窗/切换字符时才拉取对应 chunk（P1-12），失败可重试
+  const {
+    data: strokeData,
+    loading: strokeLoading,
+    error: strokeError,
+    retry: retryStroke,
+  } = useAsyncResource(() => loadStrokeOrder(character.hanzi), `stroke-order:${character.hanzi}`, open);
 
   const clearCanvas = () => {
     canvasRef.current?.clearCanvas();
@@ -74,16 +63,34 @@ export function WritingDialog({ open, onOpenChange, character, strokeCount, onNe
             </div>
           </div>
 
-          <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-dashed border-border bg-card">
-            <WritingCanvas
-              key={character.hanzi}
-              ref={canvasRef}
-              character={character.hanzi}
-              strokePaths={strokeData?.strokes}
-              medians={strokeData?.medians}
-              strokeCount={strokeCount}
-              onAccuracyChange={setAccuracy}
-            />
+          <div
+            id="writing-canvas-region"
+            className="relative aspect-square w-full overflow-hidden rounded-lg border border-dashed border-border bg-card"
+          >
+            {strokeLoading ? (
+              // 骨架屏：加载期间占位，避免画布尺寸塌陷与内容闪烁
+              <div
+                id="writing-stroke-skeleton"
+                role="status"
+                aria-label={t('common.practiceWriting')}
+                aria-busy="true"
+                className="h-full w-full animate-pulse rounded-lg bg-muted/60"
+              />
+            ) : strokeError ? (
+              <div id="writing-stroke-error" className="h-full w-full">
+                <ErrorState className="h-full py-8" onRetry={retryStroke} />
+              </div>
+            ) : (
+              <WritingCanvas
+                key={character.hanzi}
+                ref={canvasRef}
+                character={character.hanzi}
+                strokePaths={strokeData?.strokes}
+                medians={strokeData?.medians}
+                strokeCount={strokeCount}
+                onAccuracyChange={setAccuracy}
+              />
+            )}
           </div>
 
           <p className="text-center text-xs text-muted-foreground">

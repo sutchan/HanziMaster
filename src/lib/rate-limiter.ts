@@ -86,9 +86,11 @@ export class InMemoryRateLimiter implements RateLimiter {
   }
 
   private enforceKeyLimit(now: number): void {
-    if (this.buckets.size < this.options.maxKeys) return;
+    // 为即将插入的桶预留一个位置，避免清理后插入又越过上限
+    const limit = Math.max(1, this.options.maxKeys - 1);
+    if (this.buckets.size <= limit) return;
     this.sweep(now);
-    let excess = this.buckets.size - this.options.maxKeys;
+    let excess = this.buckets.size - limit;
     if (excess <= 0) return;
     // Map 迭代顺序即插入顺序：超限时淘汰最早写入的桶。
     for (const key of this.buckets.keys()) {

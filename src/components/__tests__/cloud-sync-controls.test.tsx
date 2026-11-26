@@ -12,6 +12,14 @@ import { PROGRESS_STORAGE_KEY } from '@/hooks/use-progress';
 const en = translations.en;
 const CODE = 'a'.repeat(32);
 
+/** jsdom 未实现 execCommand，测试中显式提供可 spy 的桩。 */
+const setExecCommand = (result: boolean) => {
+  Object.defineProperty(document, 'execCommand', {
+    configurable: true,
+    value: vi.fn(() => result),
+  });
+};
+
 const renderControls = () => render(
   <LocaleProvider defaultLocale="en">
     <ToastProvider>
@@ -34,7 +42,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   window.localStorage.clear();
-  window.localStorage.setItem(SYNC_CODE_STORAGE_KEY, CODE);
+  window.localStorage.setItem(SYNC_CODE_STORAGE_KEY, JSON.stringify({ _v: 1, _d: CODE }));
   window.history.replaceState(null, '', '/');
   document.cookie = 'hanzi-master-locale=; max-age=0; path=/';
   vi.restoreAllMocks();
@@ -47,7 +55,7 @@ describe('cloud sync controls', () => {
       configurable: true,
       value: { writeText } satisfies Pick<Clipboard, 'writeText'>,
     });
-    vi.spyOn(document, 'execCommand').mockReturnValue(false);
+    setExecCommand(false);
 
     renderControls();
     const input = screen.getByLabelText(en.cloud.code);
@@ -55,7 +63,7 @@ describe('cloud sync controls', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(en.cloud.copyFailed);
     await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'true'));
-    expect(input).toHaveClass('ring-vermilion-500');
+    expect(input).toHaveClass('ring-vermilion-500/30');
     expect(writeText).toHaveBeenCalledWith(CODE);
   }, 20000);
 
@@ -70,7 +78,8 @@ describe('cloud sync controls', () => {
 
     await userEvent.click(screen.getByRole('button', { name: en.common.cancel }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(window.localStorage.getItem(SYNC_CODE_STORAGE_KEY)).toBe(CODE);
+    const stored = JSON.parse(window.localStorage.getItem(SYNC_CODE_STORAGE_KEY) ?? '{}') as { _d?: unknown };
+    expect(stored._d).toBe(CODE);
   }, 20000);
 
   it('确认后生成新码并使用剪贴板复制', async () => {
@@ -85,9 +94,9 @@ describe('cloud sync controls', () => {
     await userEvent.click(await screen.findByRole('button', { name: en.cloud.confirmOk }));
 
     await waitFor(() => {
-      const next = window.localStorage.getItem(SYNC_CODE_STORAGE_KEY);
-      expect(next).not.toBe(CODE);
-      expect(next).toMatch(/^[0-9a-f]{32}$/);
+      const stored = JSON.parse(window.localStorage.getItem(SYNC_CODE_STORAGE_KEY) ?? '{}') as { _d?: unknown };
+      expect(stored._d).not.toBe(CODE);
+      expect(stored._d).toMatch(/^[0-9a-f]{32}$/);
     });
     expect(writeText).toHaveBeenCalled();
   }, 20000);

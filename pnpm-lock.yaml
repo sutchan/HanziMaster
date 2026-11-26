@@ -76,6 +76,9 @@ importers:
       '@playwright/test':
         specifier: 1.65.1
         version: 1.65.1
+      '@redocly/cli':
+        specifier: 2.84.0
+        version: 2.84.0
       '@tailwindcss/postcss':
         specifier: 4.3.4
         version: 4.3.4
@@ -1235,6 +1238,11 @@ packages:
 
   '@radix-ui/rect@1.1.3':
     resolution: {integrity: sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==}
+
+  '@redocly/cli@2.84.0':
+    resolution: {integrity: sha512-0RmjaLv9QrydTLMEKXvQTasLy4uFQRbrAIwjgRhOB1uiI3O3H7AbEmSIyvHh3r7ARx/bm9+uD154jmh+HfBG0Q==}
+    engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
+    hasBin: true
 
   '@rollup/plugin-commonjs@28.0.1':
     resolution: {integrity: sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==}
@@ -4323,6 +4331,8 @@ snapshots:
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
   '@radix-ui/rect@1.1.3': {}
+
+  '@redocly/cli@2.84.0': {}
 
   '@rollup/plugin-commonjs@28.0.1(rollup@4.67.5)':
     dependencies:

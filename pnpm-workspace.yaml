@@ -4,6 +4,8 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
+minimumReleaseAgeExclude:
+  - '@redocly/cli@2.84.0'
 onlyBuiltDependencies:
   - esbuild
   - sharp

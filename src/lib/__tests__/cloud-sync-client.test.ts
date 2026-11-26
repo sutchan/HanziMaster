@@ -2,6 +2,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyWithFallback, extractSyncErrorCode } from '../cloud-sync-client';
 
+/** jsdom 未实现 execCommand，测试中显式提供可 spy 的桩。 */
+const setExecCommand = (result: boolean) => {
+  Object.defineProperty(document, 'execCommand', {
+    configurable: true,
+    value: vi.fn(() => result),
+  });
+};
+
 const setClipboard = (writeText: (text: string) => Promise<void>) => {
   Object.defineProperty(navigator, 'clipboard', {
     configurable: true,
@@ -16,7 +24,8 @@ afterEach(() => {
 describe('copyWithFallback', () => {
   it('Clipboard 失败后回退到选中输入并调用 execCommand', async () => {
     setClipboard(vi.fn().mockRejectedValue(new Error('denied')));
-    const exec = vi.spyOn(document, 'execCommand').mockReturnValue(true);
+    setExecCommand(true);
+    const exec = vi.spyOn(document, 'execCommand');
     const input = document.createElement('input');
     document.body.appendChild(input);
     const select = vi.spyOn(input, 'select');
@@ -29,7 +38,7 @@ describe('copyWithFallback', () => {
 
   it('两种复制方式都失败时返回 failed', async () => {
     setClipboard(vi.fn().mockRejectedValue(new Error('denied')));
-    vi.spyOn(document, 'execCommand').mockReturnValue(false);
+    setExecCommand(false);
     await expect(copyWithFallback('code')).resolves.toBe('failed');
   });
 

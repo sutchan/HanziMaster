@@ -1,7 +1,7 @@
 // src/components/pages/learn-page.tsx v5.2.61
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocale } from '@/components/locale-provider';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
@@ -10,6 +10,8 @@ import { useHaptic } from '@/hooks/use-haptic';
 import { useProgress } from '@/hooks/use-progress';
 import { characters } from '@/lib/characters';
 import { safeGetItem, trySetItem } from '@/lib/storage';
+import { getArrowStep } from '@/lib/direction';
+import { useLearnQuizSession } from '@/hooks/use-learn-quiz-session';
 
 const SELECTED_CHAR_KEY = 'hanzi-master-selected-char';
 import { CharacterGrid } from '@/components/learn/character-grid';
@@ -30,10 +32,8 @@ export default function LearnPage() {
   const vibrate = useHaptic();
   const progress = useProgress();
   const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(characters[0]?.id ?? null);
-  const [showQuizDialog, setShowQuizDialog] = useState(false);
-  const [quizAnswer, setQuizAnswer] = useState('');
-  const [quizCorrect, setQuizCorrect] = useState<boolean | null>(null);
-  const autoCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // OPT-18：测验状态与计时器由统一 hook/reducer 管理，重进即空态
+  const quiz = useLearnQuizSession();
 
   // 选择状态持久化：刷新后保留上次学习的字，否则总回到第 1 字（F7）
   useEffect(() => {
@@ -49,34 +49,15 @@ export default function LearnPage() {
   const selectedCharacter = characters.find((c) => c.id === selectedCharacterId) || null;
   const currentIndex = Math.max(0, characters.findIndex((c) => c.id === selectedCharacterId));
 
-  // 答对后定时自动关闭弹窗；用 ref 持有句柄以便关闭/卸载时清理，
-  // 避免用户提前关闭或路由切换后定时器仍触发，造成操作已卸载组件或状态错乱。
   const handleQuizSubmit = () => {
-    if (!selectedCharacter || quizCorrect !== null || !quizAnswer.trim()) return;
-    clearAutoCloseTimer();
-    const isCorrect = quizAnswer.toLowerCase() === selectedCharacter.pinyin.toLowerCase();
-    setQuizCorrect(isCorrect);
+    if (!selectedCharacter || quiz.state.correct !== null || !quiz.state.answer.trim()) return;
+    const isCorrect = quiz.state.answer.toLowerCase() === selectedCharacter.pinyin.toLowerCase();
     // 学习页测验同样计入准确率/连胜/学习记录（此前只反馈不写进度）
     progress.recordQuizResult(selectedCharacter.id, isCorrect);
     vibrate(isCorrect ? 'success' : 'error');
-    if (isCorrect) {
-      autoCloseTimer.current = setTimeout(() => {
-        setShowQuizDialog(false);
-        setQuizAnswer('');
-        setQuizCorrect(null);
-      }, 1500);
-    }
+    // 答对后由 hook 定时自动关闭，所有重进/关闭路径统一清理计时器
+    quiz.submit(isCorrect);
   };
-
-  const clearAutoCloseTimer = () => {
-    if (autoCloseTimer.current) {
-      clearTimeout(autoCloseTimer.current);
-      autoCloseTimer.current = null;
-    }
-  };
-
-  // 组件卸载时清理定时器
-  useEffect(() => clearAutoCloseTimer, []);
 
   const goCharacter = useCallback((delta: number) => {
     const idx = characters.findIndex((c) => c.id === (selectedCharacterId ?? -1));
@@ -89,16 +70,17 @@ export default function LearnPage() {
   // 键盘快捷键：← → 切换汉字（弹窗打开或组合键时忽略）
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showQuizDialog || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (quiz.state.open || e.ctrlKey || e.metaKey || e.altKey) return;
       // 输入框 / 文本域 / 可编辑区域中的方向键属于文本编辑，不应切换汉字
       const target = e.target as HTMLElement | null;
       if (target?.isContentEditable || (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return;
-      if (e.key === 'ArrowRight') goCharacter(1);
-      if (e.key === 'ArrowLeft') goCharacter(-1);
+      // OPT-13：方向键步进按事件目标的实际 direction 计算，RTL 左右互换
+      const step = getArrowStep(e.key, target ?? null);
+      if (step !== 0) goCharacter(step);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showQuizDialog, goCharacter]);
+  }, [quiz.state.open, goCharacter]);
 
   return (
     <div id="learn-page" className="min-h-screen bg-background">
@@ -139,7 +121,7 @@ export default function LearnPage() {
           <CharacterDetail
             key={selectedCharacter.id}
             character={selectedCharacter}
-            onStartQuiz={() => setShowQuizDialog(true)}
+            onStartQuiz={quiz.open}
             onNextCharacter={handleNextCharacter}
             onSpeak={speak}
             speechSupported={speechSupported}
@@ -151,22 +133,12 @@ export default function LearnPage() {
       </div>
 
       <QuizDialog
-        open={showQuizDialog}
-        onOpenChange={(open) => {
-          // 每次打开/关闭都重置为全新空态，避免上次答案与结果残留导致重复提交
-          clearAutoCloseTimer();
-          setQuizAnswer('');
-          setQuizCorrect(null);
-          setShowQuizDialog(open);
-        }}
+        open={quiz.state.open}
+        onOpenChange={(open) => (open ? quiz.open() : quiz.close())}
         character={selectedCharacter}
-        value={quizAnswer}
-        onChange={(v) => {
-          clearAutoCloseTimer();
-          setQuizAnswer(v);
-          setQuizCorrect(null);
-        }}
-        correct={quizCorrect}
+        value={quiz.state.answer}
+        onChange={quiz.change}
+        correct={quiz.state.correct}
         onSubmit={handleQuizSubmit}
       />
     </div>

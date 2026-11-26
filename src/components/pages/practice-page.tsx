@@ -1,7 +1,7 @@
-// src/components/pages/practice-page.tsx v5.2.57
+// src/components/pages/practice-page.tsx v5.2.61
 'use client';
 
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import { useLocale } from '@/components/locale-provider';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useProgress } from '@/hooks/use-progress';
@@ -11,6 +11,7 @@ import { characters } from '@/lib/characters';
 import { quizCharacters, type CharacterQuiz } from '@/components/practice/practice-assets';
 import { PracticeOptionsGrid } from '@/components/practice/practice-options';
 import { WeeklyProgress } from '@/components/practice/weekly-progress';
+import { INITIAL_PRACTICE_QUIZ, practiceQuizReducer } from '@/components/pages/quiz-session';
 import dynamic from 'next/dynamic';
 
 // 弹窗与 Canvas 相关重型组件按需拆包（P1-12）
@@ -26,20 +27,6 @@ const QuizDialog = dynamic(
 // 汉字到笔画数的映射，供书写对话框显示描红提示
 const strokeMap = new Map(characters.map((c) => [c.hanzi, c.strokes]));
 
-interface QuizState {
-  currentIndex: number;
-  correctCount: number;
-  wrongCount: number;
-  answered: boolean;
-}
-
-const INITIAL_QUIZ_STATE: QuizState = {
-  currentIndex: 0,
-  correctCount: 0,
-  wrongCount: 0,
-  answered: false,
-};
-
 export default function PracticePage() {
   const { t, locale } = useLocale();
   const progress = useProgress();
@@ -50,8 +37,8 @@ export default function PracticePage() {
   const [showWritingDialog, setShowWritingDialog] = useState(false);
   const [showQuizDialog, setShowQuizDialog] = useState(false);
   const [currentWriteChar, setCurrentWriteChar] = useState<CharacterQuiz>(quizCharacters[0]);
-  const [quizState, setQuizState] = useState<QuizState>(INITIAL_QUIZ_STATE);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  // OPT-18：测验进度与答案集中在显式 reducer，重开统一 reset
+  const [quizState, dispatchQuiz] = useReducer(practiceQuizReducer, INITIAL_PRACTICE_QUIZ);
 
   const handlePracticeOption = (optionId: string) => {
     setSelectedOption(optionId);
@@ -75,39 +62,27 @@ export default function PracticePage() {
 
   const handleQuizAnswer = (answer: string) => {
     if (quizState.answered) return;
-    setSelectedAnswer(answer);
     const currentQuizChar = quizCharacters[quizState.currentIndex];
     const isCorrect = answer === currentQuizChar.hanzi;
     // 记录测验结果，驱动进度统计（连胜/准确率/周活动）
     progress.recordQuizResult(currentQuizChar.id, isCorrect);
-    setQuizState((prev) => ({
-      ...prev,
-      correctCount: isCorrect ? prev.correctCount + 1 : prev.correctCount,
-      wrongCount: isCorrect ? prev.wrongCount : prev.wrongCount + 1,
-      answered: true,
-    }));
+    dispatchQuiz({ type: 'answer', answer, correct: isCorrect });
     vibrate(isCorrect ? 'success' : 'error');
-  };
-
-  const resetQuiz = () => {
-    setQuizState(INITIAL_QUIZ_STATE);
-    setSelectedAnswer('');
   };
 
   const handleNextQuiz = () => {
     const nextIndex = quizState.currentIndex + 1;
     if (nextIndex >= quizCharacters.length) {
       setShowQuizDialog(false);
-      resetQuiz();
+      dispatchQuiz({ type: 'reset' });
     } else {
-      setQuizState((prev) => ({ ...prev, currentIndex: nextIndex, answered: false }));
-      setSelectedAnswer('');
+      dispatchQuiz({ type: 'next', total: quizCharacters.length });
     }
   };
 
   const handleQuizOpenChange = (open: boolean) => {
     setShowQuizDialog(open);
-    if (!open) resetQuiz();
+    if (!open) dispatchQuiz({ type: 'reset' });
   };
 
   const currentQuizChar = quizCharacters[quizState.currentIndex];
@@ -153,7 +128,7 @@ export default function PracticePage() {
         open={showQuizDialog}
         onOpenChange={handleQuizOpenChange}
         character={currentQuizChar}
-        selectedAnswer={selectedAnswer}
+        selectedAnswer={quizState.selectedAnswer}
         answered={quizState.answered}
         onAnswer={handleQuizAnswer}
         onNext={handleNextQuiz}
