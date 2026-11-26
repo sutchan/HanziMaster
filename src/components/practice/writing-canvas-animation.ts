@@ -1,8 +1,10 @@
-// src/components/practice/writing-canvas-animation.ts v5.2.46
+// src/components/practice/writing-canvas-animation.ts v5.2.61
 // 书写引导动画：沿当前笔画中位线逐帧描线，已完成的笔画以浅色填充字形呈现。
 // 抽离自 writing-canvas.tsx，使组件文件 ≤200 行（单一职责：动画播放）。
+// OPT-04：路径/颜色/尺寸在准备阶段缓存，帧内只读取缓存。
 
-import { drawHint, drawMedianStroke, parsePath, resolveFg, resolvePrimary, scale } from './writing-canvas-utils';
+import { drawMedianStroke, drawPreparedHint, scale } from './writing-canvas-utils';
+import { createAnimationPaintCache } from './writing-canvas-animation-cache';
 
 export interface StrokeAnimationHandle {
   cancel: () => void;
@@ -13,8 +15,10 @@ export interface StrokeAnimationOptions {
   character: string;
   /** 当前笔画的中位线（笔顺方向），用于沿线路径描线 */
   median: number[][];
-  /** 画布实际边长（min(width, height)），用于坐标缩放 */
+  /** 画布实际边长（min(width, height)），用于坐标缩放；未提供 rect 时作为正方形边长 */
   size: number;
+  /** 准备阶段读取的画布 rect；提供后帧内无需再次读取 rect */
+  rect?: { width: number; height: number };
   /** 已完成笔画下标集合，渲染为浅色虚线轮廓 */
   completed: Set<number>;
   /** 全部笔画的 SVG path（有序），用于绘制已完成笔画轮廓 */
@@ -28,29 +32,31 @@ export function runStrokeAnimation(opts: StrokeAnimationOptions): StrokeAnimatio
   const { canvas, character, median, size, completed, strokePaths, onComplete } = opts;
   const ctx = canvas.getContext('2d');
   if (!ctx) return { cancel: () => {} };
-  const primary = resolvePrimary();
+  // 准备阶段：解析路径与主题 token 一次，帧内只读缓存（主题变化由缓存句柄失效重建）
+  const rect = opts.rect ?? { width: size, height: size };
+  const paintCache = createAnimationPaintCache({ character, strokePaths, completed, ...rect });
   const start = performance.now();
   const dur = 500;
   let raf: number | null = null;
 
   const frame = (now: number) => {
     const progress = Math.min((now - start) / dur, 1);
-    drawHint(canvas, character);
-    // 已完成笔：切换到数据坐标系（x 缩放、y 翻转 + 900 基线）后填充字形轮廓
-    completed.forEach((i) => {
-      const p = parsePath(strokePaths[i]);
+    const paint = paintCache.read();
+    drawPreparedHint(canvas, character, paint);
+    // 已完成笔：切换到数据坐标系（x 缩放、y 翻转 + 900 基线）后填充缓存的轮廓
+    paint.completedPaths.forEach((p) => {
       if (!p) return;
       ctx.save();
-      ctx.translate(0, scale(900, size));
-      ctx.scale(size / 1024, -size / 1024);
-      ctx.fillStyle = resolveFg();
+      ctx.translate(0, scale(900, paint.size));
+      ctx.scale(paint.size / 1024, -paint.size / 1024);
+      ctx.fillStyle = paint.fg;
       ctx.globalAlpha = 0.15;
       ctx.fill(p);
       ctx.restore();
     });
     // 当前笔：沿中位线动画描线
     if (median && median.length >= 2) {
-      drawMedianStroke(ctx, median, size, progress, primary, 5);
+      drawMedianStroke(ctx, median, paint.size, progress, paint.primary, 5);
     }
     if (progress < 1) {
       raf = requestAnimationFrame(frame);
@@ -91,6 +97,8 @@ export function startNextStroke(params: {
     character,
     median: medians?.[next] ?? [],
     size,
+    // 复用已读取的 rect，避免动画帧内重复 getBoundingClientRect
+    rect: { width: rect.width, height: rect.height },
     completed,
     strokePaths,
     onComplete: () => {

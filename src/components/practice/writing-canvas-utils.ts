@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-utils.ts v5.2.46
+// src/components/practice/writing-canvas-utils.ts v5.2.61
 // 书写画布的绘制工具函数集：设计 token 读取、坐标变换、淡字底图与中位线绘制。
 // 描红贴合度判定见 writing-canvas-scoring.ts（单一职责拆分，保证单文件 ≤200 行）。
 
@@ -44,26 +44,50 @@ export const syncCanvasSize = (canvas: HTMLCanvasElement): boolean => {
   return true;
 };
 
-// 淡字底图绘制
-export const drawHint = (canvas: HTMLCanvasElement, character: string) => {
+/** 淡字底图的预计算输入：宽高与颜色 token 在准备阶段取一次，帧内复用。 */
+export interface HintPaint {
+  width: number;
+  height: number;
+  fg: string;
+  serif: string;
+}
+
+/** 用缓存的尺寸/颜色绘制淡字底图；不读取 rect 与 CSS 变量，供动画帧复用。 */
+export function drawPreparedHint(canvas: HTMLCanvasElement, character: string, paint: HintPaint) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  syncCanvasSize(canvas);
+  // 与 syncCanvasSize 同口径，但尺寸来自缓存，避免动画帧内读取 rect
+  const width = Math.round(paint.width * dpr);
+  const height = Math.round(paint.height * dpr);
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(dpr, dpr);
   ctx.lineWidth = 4;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = resolveFg();
-  ctx.font = `${Math.min(rect.width, rect.height) * 0.4}px ${resolveSerif()}`;
-  ctx.fillStyle = resolveFg();
+  ctx.strokeStyle = paint.fg;
+  ctx.font = `${Math.min(paint.width, paint.height) * 0.4}px ${paint.serif}`;
+  ctx.fillStyle = paint.fg;
   ctx.globalAlpha = 0.08;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(character, rect.width / 2, rect.height / 2);
+  ctx.fillText(character, paint.width / 2, paint.height / 2);
   ctx.globalAlpha = 1;
+}
+
+// 淡字底图绘制（通用入口）：现取 rect/token 后委托给缓存版本，保持原有公开行为
+export const drawHint = (canvas: HTMLCanvasElement, character: string) => {
+  const rect = canvas.getBoundingClientRect();
+  drawPreparedHint(canvas, character, {
+    width: rect.width,
+    height: rect.height,
+    fg: resolveFg(),
+    serif: resolveSerif(),
+  });
 };
 
 /** 尺寸变化后重放已完成的指针笔迹；点位为 CSS 像素，与 pointerMove 记录时同坐标系。 */
