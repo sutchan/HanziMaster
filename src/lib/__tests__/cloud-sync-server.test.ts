@@ -1,4 +1,4 @@
-// src/lib/__tests__/cloud-sync-server.test.ts v5.2.59
+// src/lib/__tests__/cloud-sync-server.test.ts v5.2.61
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGet, mockPut } = vi.hoisted(() => ({ mockGet: vi.fn(), mockPut: vi.fn() }));
@@ -6,6 +6,7 @@ vi.mock('@vercel/blob', () => ({ get: mockGet, put: mockPut }));
 
 import {
   rateLimit, readCloudBackup, writeCloudBackup, syncConfigured, syncErrorMessage,
+  setRateLimiter, createDefaultRateLimiter,
 } from '../cloud-sync-server';
 
 const CODE = 'a'.repeat(32);
@@ -25,6 +26,7 @@ describe('cloud-sync-server', () => {
   beforeEach(() => {
     mockGet.mockReset();
     mockPut.mockReset();
+    setRateLimiter(createDefaultRateLimiter());
     // 应用自有变量名优先；SDK 默认的全局名同时清空，确保断言只反映新命名
     vi.stubEnv('BLOB_HANZI_READ_WRITE_TOKEN', 'token');
     vi.stubEnv('BLOB_HANZI_STORE_ID', '');
@@ -40,6 +42,14 @@ describe('cloud-sync-server', () => {
     for (let i = 0; i < 30; i++) expect(rateLimit(key, now)).toBe(true);
     expect(rateLimit(key, now + 1000)).toBe(false);
     expect(rateLimit(key, now + 61_000)).toBe(true);
+  });
+
+  it('允许注入外部限流器实现（分布式注入点）', () => {
+    const allow = vi.fn(() => false);
+    setRateLimiter({ allow });
+    expect(rateLimit('injected')).toBe(false);
+    expect(allow).toHaveBeenCalledWith('injected', expect.any(Number));
+    setRateLimiter(createDefaultRateLimiter());
   });
 
   it('reads a valid private backup and rejects missing/oversized ones', async () => {

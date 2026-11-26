@@ -1,9 +1,10 @@
-// src/components/toast.tsx v5.2.44
+// src/components/toast.tsx v5.2.61
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { getDirectionDelta } from '@/lib/direction';
 import { useTranslation } from '@/components/locale-provider';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -57,40 +58,45 @@ const iconMap: Record<ToastType, ReactNode> = {
 
 function ToastItem({ id, message, type, duration = 5000, onRemove }: Toast & { onRemove: (id: string) => void }) {
   const { t } = useTranslation();
+  const itemRef = useRef<HTMLDivElement | null>(null);
   const [isExiting, setIsExiting] = useState(false);
+  // OPT-13：退场方向按元素实际 direction 计算，RTL 时向左滑出
+  const [exitClass, setExitClass] = useState('translate-x-full');
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const startExit = useCallback(() => {
+    setExitClass(getDirectionDelta(itemRef.current) === 1 ? '-translate-x-full' : 'translate-x-full');
+    setIsExiting(true);
+    if (exitTimer.current) clearTimeout(exitTimer.current);
+    exitTimer.current = setTimeout(() => onRemove(id), 300);
+  }, [id, onRemove]);
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsExiting(true);
-      exitTimer.current = setTimeout(() => onRemove(id), 300);
-    }, duration);
+    const timer = setTimeout(startExit, duration);
     return () => {
       clearTimeout(timer);
       // 内层退出计时器也必须清理：否则卸载后仍调用 onRemove 更新已卸载 Provider
       if (exitTimer.current) clearTimeout(exitTimer.current);
       exitTimer.current = null;
     };
-  }, [id, duration, onRemove]);
+  }, [duration, startExit]);
 
   return (
     <div
+      ref={itemRef}
+      id={id}
       role={type === 'error' ? 'alert' : 'status'}
       className={cn(
         'flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg min-w-[280px] max-w-[400px]',
         'transition-[opacity,transform] duration-300',
-        isExiting ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0 animate-slide-in-right',
+        isExiting ? cn('opacity-0', exitClass) : 'opacity-100 translate-x-0 animate-slide-in-right',
         typeStyles[type]
       )}
     >
       {iconMap[type]}
       <span className="text-sm font-medium flex-1">{message}</span>
       <button
-        onClick={() => {
-          setIsExiting(true);
-          if (exitTimer.current) clearTimeout(exitTimer.current);
-          exitTimer.current = setTimeout(() => onRemove(id), 300);
-        }}
+        onClick={startExit}
         className="touch-target p-1 rounded-lg hover:bg-ink-900/5 dark:hover:bg-ink-100/10 transition-colors"
         aria-label={t('common.closeNotification')}
       >

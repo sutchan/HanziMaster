@@ -1,8 +1,8 @@
-// src/app/layout.tsx v5.2.59
+// src/app/layout.tsx v5.2.61
 import { cache } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';
-import { Space_Grotesk, Playfair_Display, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google';
+import { Space_Grotesk, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/google-analytics';
 import { ThemeProvider } from '@/components/theme-provider';
 import { LocaleProvider } from '@/components/locale-provider';
@@ -30,12 +30,8 @@ const playfairDisplay = Playfair_Display({
   // 仅标题/序号使用，非首屏必需：不预载以减少首屏字体请求（T3）
   preload: false,
 });
-const notoSerifSC = Noto_Serif_SC({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-serif',
-  display: 'swap',
-});
+// OPT-01：移除 Noto Serif SC 的 latin 预载——它只包含拉丁字形，却占用 --font-serif，
+// 导致汉字落到浏览器默认字体。中文衬线改由 globals.css 的系统字体栈提供。
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
@@ -90,7 +86,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       lang={locale}
       dir={direction}
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${playfairDisplay.variable} ${notoSerifSC.variable} ${jetbrainsMono.variable}`}
+      className={`${spaceGrotesk.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         {/* 静态内联脚本，无用户输入； CSP script-src 'unsafe-inline' 已放行 */}

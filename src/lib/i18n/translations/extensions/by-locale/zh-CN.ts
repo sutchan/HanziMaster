@@ -8,7 +8,7 @@ export const extensions: LocaleExtensions = {
     learn: { strokeDemoLabel: '笔顺演示区域' },
     practice: { canvasLabel: '田字格书写画布', keyboardLabel: '笔顺输入（键盘替代路径）', keyboardHint: '按顺序输入笔画编号，例如 1 2 3，用空格或逗号分隔。' },
   },
-  cloud: { title: '云同步', desc: '请妥善保管同步码——任何持有它的人都能访问你的学习进度。', code: '同步码', generate: '生成', copy: '复制', upload: '上传到云端', download: '从云端恢复', uploadDone: '进度已上传', downloadDone: '进度已恢复', failed: '云同步失败', notConfigured: '云同步暂不可用', noProgress: '本地暂无可上传的进度' },
+  cloud: { title: '云同步', desc: '请妥善保管同步码——任何持有它的人都能访问你的学习进度。', code: '同步码', generate: '生成', copy: '复制', upload: '上传到云端', download: '从云端恢复', uploadDone: '进度已上传', downloadDone: '进度已恢复', failed: '云同步失败', notConfigured: '云同步暂不可用', noProgress: '本地暂无可上传的进度', copyFailed: '复制失败——同步码已选中，请按 Ctrl/Cmd+C 手动复制', confirmTitle: '替换当前同步码？', confirmDesc: '生成新同步码后，旧云端进度将无法访问。确定继续吗？', confirmOk: '替换并复制', errors: { notConfigured: '云同步暂不可用', invalidJson: '请求数据格式无效', invalidCode: '同步码无效', invalidBackup: '备份数据无效', rateLimited: '请求过于频繁，请稍后再试', usePost: '云同步请求请使用 POST 方法', notFound: '该同步码暂无云端进度', tooLarge: '备份数据超过大小限制', emptyBackup: '云端备份中没有进度数据', emptyProgress: '拒绝用空进度覆盖云端数据', readFailed: '读取云端进度失败', writeFailed: '写入云端进度失败' } },
   geo: {
     factsTitle: '关于 HanziMaster',
     factsLead:

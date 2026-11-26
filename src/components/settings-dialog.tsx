@@ -1,4 +1,4 @@
-// src/components/settings-dialog.tsx v5.2.58
+// src/components/settings-dialog.tsx v5.2.61
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import { useLocale } from '@/components/locale-provider';
 import { localeNames } from '@/components/locale-toggle';
 import { useToast } from '@/components/toast';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type AppSettings } from '@/lib/settings';
+import { getDirectionDelta } from '@/lib/direction';
 import { SwitchRow, sectionTitle } from '@/components/settings-dialog-parts';
 import { DataControls } from '@/components/data-controls';
 import { PrivacyControls } from '@/components/privacy-controls';
@@ -85,7 +86,8 @@ export function SettingsButton({ id = 'settings-open' }: { id?: string }) {
                   onKeyDown={(e) => {
                     if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
                     e.preventDefault();
-                    const delta = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1;
+                    // OPT-13：RTL 下物理左右键与视觉顺序相反，按元素 computed direction 换算步进
+                    const delta = (e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1) * getDirectionDelta(e.currentTarget);
                     const next = THEMES[(THEMES.indexOf(theme) + delta + THEMES.length) % THEMES.length];
                     setTheme(next);
                     (e.currentTarget.parentElement?.children[THEMES.indexOf(next)] as HTMLElement | undefined)?.focus();

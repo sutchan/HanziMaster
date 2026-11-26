@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-input.ts v5.2.51
+// src/components/practice/writing-canvas-input.ts v5.2.61
 // 书写画布指针交互：笔顺引导与跟写交替、指针身份过滤与 DPR/尺寸同步（单一职责拆分，保证组件 ≤200 行）。
 
 import type { PointerEvent as ReactPointerEvent } from 'react';
@@ -26,6 +26,11 @@ export interface WritingInputCtx {
   resetRefs: () => void;
 }
 
+/** pointerMove 最小抽稀间距（CSS 像素）：低于此距离的移动不落点，降低轨迹密度与后续评分开销。 */
+const MIN_POINT_DISTANCE = 2;
+/** 按画布记录上一落点：inputContext 每次事件重建，不能挂在 ctx 对象上。 */
+const lastPoints = new WeakMap<HTMLCanvasElement, { x: number; y: number }>();
+
 const getPoint = (ctx: WritingInputCtx, e: ReactPointerEvent<HTMLCanvasElement>) => {
   const rect = ctx.canvas?.getBoundingClientRect();
   if (!rect) return { x: 0, y: 0 };
@@ -36,6 +41,7 @@ const startStroke = (ctx: WritingInputCtx, e: ReactPointerEvent<HTMLCanvasElemen
   ctx.isDrawing.current = true;
   const p = getPoint(ctx, e);
   ctx.userPoints.current = [p];
+  if (ctx.canvas) lastPoints.set(ctx.canvas, p);
   const strokeCtx = ctx.canvas?.getContext('2d');
   strokeCtx?.beginPath();
   strokeCtx?.moveTo(p.x, p.y);
@@ -83,8 +89,12 @@ export const pointerMove = (ctx: WritingInputCtx, e: ReactPointerEvent<HTMLCanva
   const strokeCtx = ctx.canvas?.getContext('2d');
   if (!strokeCtx) return;
   const p = getPoint(ctx, e);
+  const last = ctx.canvas ? lastPoints.get(ctx.canvas) : undefined;
+  // 抽稀：与上一记录点过近时既不落笔也不记点，保持绘制与评分轨迹一致
+  if (last && Math.hypot(p.x - last.x, p.y - last.y) < MIN_POINT_DISTANCE) return;
   strokeCtx.lineTo(p.x, p.y);
   strokeCtx.stroke();
+  if (ctx.canvas) lastPoints.set(ctx.canvas, p);
   if (ctx.strokePaths) ctx.userPoints.current.push(p);
 };
 

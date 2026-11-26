@@ -1,15 +1,22 @@
-// src/components/locale-provider.tsx v5.2.57
+// src/components/locale-provider.tsx v5.2.61
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Locale, TranslationKey, Translations } from '@/lib/i18n';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE, isSupportedLocale, isRtlLocale } from '@/lib/site';
-import { withLocale, syncMetadataLocale } from '@/lib/sync-locale-meta';
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '@/lib/site';
 import { getNestedValue, interpolate } from '@/lib/i18n/translate';
-import { safeGetItem, safeSetItem } from '@/lib/storage';
 import { loadTranslations } from '@/lib/i18n/load-translations';
 import { en } from '@/lib/i18n/translations/en';
 import { extendTranslations } from '@/lib/i18n/translations/extensions';
+import { LocaleStateContext, TranslationContext, useLocaleState, useTranslationContext } from '@/components/locale-contexts';
+import { useStableEvent } from '@/hooks/use-stable-event';
+import {
+  applyDocumentLocale,
+  getUrlLocale,
+  resolveInitialLocale,
+  safeSetItem,
+  syncUrlLocale,
+} from '@/lib/locale-utils';
 
 type LocaleProviderProps = {
   children: React.ReactNode;
@@ -19,67 +26,8 @@ type LocaleProviderProps = {
   storageKey?: string;
 };
 
-type LocaleProviderState = {
-  locale: Locale;
-  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
-  setLocale: (locale: Locale) => void;
-  availableLocales: Locale[];
-};
-
 const STORAGE_KEY = 'hanzi-master-locale';
-const COOKIE_KEY = 'hanzi-master-locale';
 const FALLBACK_DICTIONARY = extendTranslations(en, DEFAULT_LOCALE) as Translations;
-
-const LocaleProviderContext = createContext<LocaleProviderState | undefined>(undefined);
-
-const getBrowserLocale = (): Locale => {
-  if (typeof navigator === 'undefined') return DEFAULT_LOCALE;
-  const browserLang = navigator.language.toLowerCase();
-  if (browserLang.startsWith('zh')) {
-    return /tw|hk|mo|hant/.test(browserLang) ? 'zh-TW' : 'zh-CN';
-  }
-  const localeMap: Record<string, Locale> = {
-    es: 'es',
-    ar: 'ar',
-    fr: 'fr',
-    pt: 'pt-BR',
-    de: 'de',
-    ja: 'ja',
-    ko: 'ko',
-    ru: 'ru',
-  };
-  for (const [lang, locale] of Object.entries(localeMap)) {
-    if (browserLang.startsWith(lang)) return locale;
-  }
-  return DEFAULT_LOCALE;
-};
-
-/** 语言来源优先级：/ {locale}/ 前缀 > ?lang= > localStorage > 浏览器语言。 */
-const getUrlLocale = (): Locale | null => {
-  if (typeof window === 'undefined') return null;
-  const fromPath = window.location.pathname.split('/').filter(Boolean)[0];
-  if (fromPath && isSupportedLocale(fromPath)) return fromPath;
-  const fromQuery = new URLSearchParams(window.location.search).get('lang');
-  return fromQuery && isSupportedLocale(fromQuery) ? fromQuery : null;
-};
-
-/** 同步 lang / dir（RTL）、cookie 与 SEO 元数据，供 SSR 首屏读取。 */
-const applyDocumentLocale = (value: Locale): void => {
-  document.documentElement.lang = value;
-  document.documentElement.dir = isRtlLocale(value) ? 'rtl' : 'ltr';
-  document.cookie = `${COOKIE_KEY}=${encodeURIComponent(value)}; path=/; max-age=31536000; samesite=lax`;
-  syncMetadataLocale(value);
-};
-
-/** 语言写入 URL 前缀：用 pushState 保留切换历史，浏览器后退可回到原语言（U5）。 */
-const syncUrlLocale = (value: Locale): void => {
-  const url = new URL(window.location.href);
-  url.href = withLocale(url.toString(), value);
-  url.searchParams.delete('lang');
-  const next = url.toString();
-  if (next === window.location.href) return;
-  window.history.pushState({ locale: value }, '', next);
-};
 
 export function LocaleProvider({
   children,
@@ -94,9 +42,7 @@ export function LocaleProvider({
   );
 
   useEffect(() => {
-    const stored = safeGetItem<Locale>(storageKey, defaultLocale);
-    const initial =
-      getUrlLocale() ?? (stored && isSupportedLocale(stored) ? stored : getBrowserLocale());
+    const initial = resolveInitialLocale(storageKey, defaultLocale);
     setLocaleState(initial);
     applyDocumentLocale(initial);
     // URL / cookie 胜出时同步回写存储，避免三处状态分叉导致后续页面语言跳变
@@ -149,33 +95,37 @@ export function LocaleProvider({
     [storageKey],
   );
 
-  const t = useCallback(
+  // OPT-06：t 引用恒定（useEvent 语义），内部闭包随词典更新，memo 子树不会因词典到达而失效。
+  const t = useStableEvent(
     (key: TranslationKey, params?: Record<string, string | number>): string =>
       interpolate(getNestedValue(dictionary, key) || key, params),
-    [dictionary],
   );
 
-  const value = useMemo<LocaleProviderState>(
-    () => ({ locale, t, setLocale, availableLocales: [...SUPPORTED_LOCALES] }),
-    [locale, t, setLocale],
+  // 两个 Context 分离：语言状态与翻译通道各自变更，只订阅状态的组件不随词典重渲染。
+  const stateValue = useMemo(
+    () => ({ locale, setLocale, availableLocales: [...SUPPORTED_LOCALES] }),
+    [locale, setLocale],
   );
+  const translationValue = useMemo(() => ({ t, dictionary }), [t, dictionary]);
 
   return (
-    <LocaleProviderContext.Provider {...props} value={value}>
-      {children}
-    </LocaleProviderContext.Provider>
+    <LocaleStateContext.Provider {...props} value={stateValue}>
+      <TranslationContext.Provider value={translationValue}>{children}</TranslationContext.Provider>
+    </LocaleStateContext.Provider>
   );
 }
 
+/** 公开 API 不变：useLocale 仍返回 locale / t / setLocale / availableLocales。 */
 export const useLocale = () => {
-  const context = useContext(LocaleProviderContext);
-  if (context === undefined) {
-    throw new Error('useLocale must be used within a LocaleProvider');
-  }
-  return context;
+  const state = useLocaleState();
+  const { t } = useTranslationContext();
+  return { ...state, t };
 };
 
 export const useTranslation = () => {
-  const { t } = useLocale();
+  const { t } = useTranslationContext();
   return { t };
 };
+
+/** 仅订阅语言状态的内部入口，供按需订阅与渲染次数测试使用。 */
+export { useLocaleState };

@@ -14,10 +14,20 @@ import { extensions as ja } from './by-locale/ja';
 import { extensions as ko } from './by-locale/ko';
 import { extensions as ru } from './by-locale/ru';
 
+// prettier-ignore
+export interface CloudErrorTexts {
+  notConfigured: string; invalidJson: string; invalidCode: string; invalidBackup: string;
+  rateLimited: string; usePost: string; notFound: string; tooLarge: string;
+  emptyBackup: string; emptyProgress: string; readFailed: string; writeFailed: string;
+}
+
+// prettier-ignore
 export interface CloudTexts {
   title: string; desc: string; code: string; generate: string; copy: string;
   upload: string; download: string; uploadDone: string; downloadDone: string;
   failed: string; notConfigured: string; noProgress: string;
+  copyFailed: string; confirmTitle: string; confirmDesc: string; confirmOk: string;
+  errors: CloudErrorTexts;
 }
 
 // prettier-ignore

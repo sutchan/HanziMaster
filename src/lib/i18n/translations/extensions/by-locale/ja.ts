@@ -8,7 +8,7 @@ export const extensions: LocaleExtensions = {
     learn: { strokeDemoLabel: '筆順デモ領域' },
     practice: { canvasLabel: '田字格・書き込みキャンバス', keyboardLabel: '筆順入力（キーボード代替）', keyboardHint: '筆画番号を順に入力してください（例：1 2 3）。スペースまたはカンマで区切ります。' },
   },
-  cloud: { title: 'クラウド同期', desc: '同期コードは秘密にしてください。知る人は誰でも進捗にアクセスできます。', code: '同期コード', generate: '生成', copy: 'コピー', upload: 'クラウドにアップロード', download: 'クラウドから復元', uploadDone: '進捗をアップロードしました', downloadDone: '進捗を復元しました', failed: '同期に失敗しました', notConfigured: 'クラウド同期は利用できません', noProgress: 'アップロードするローカル進捗がありません' },
+  cloud: { title: 'クラウド同期', desc: '同期コードは秘密にしてください。知る人は誰でも進捗にアクセスできます。', code: '同期コード', generate: '生成', copy: 'コピー', upload: 'クラウドにアップロード', download: 'クラウドから復元', uploadDone: '進捗をアップロードしました', downloadDone: '進捗を復元しました', failed: '同期に失敗しました', notConfigured: 'クラウド同期は利用できません', noProgress: 'アップロードするローカル進捗がありません', copyFailed: 'コピーできませんでした。同期コードを選択したので、Ctrl/Cmd+C で手動コピーしてください', confirmTitle: '現在の同期コードを置き換えますか？', confirmDesc: '新しいコードを生成すると、旧コードのクラウド進捗にアクセスできなくなります。続けますか？', confirmOk: '置き換えてコピー', errors: { notConfigured: 'クラウド同期は利用できません', invalidJson: 'リクエストデータが無効です', invalidCode: '同期コードが無効です', invalidBackup: 'バックアップデータが無効です', rateLimited: 'リクエストが多すぎます。しばらくしてからお試しください', usePost: '同期リクエストには POST を使用してください', notFound: 'このコードのクラウド進捗はありません', tooLarge: 'バックアップがサイズ上限を超えています', emptyBackup: 'クラウドバックアップに進捗がありません', emptyProgress: '空のデータでクラウド進捗を上書きできません', readFailed: 'クラウド進捗の読み取りに失敗しました', writeFailed: 'クラウド進捗の書き込みに失敗しました' } },
   geo: {
     factsTitle: 'HanziMaster について',
     factsLead:

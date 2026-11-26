@@ -1,4 +1,4 @@
-/* src/app/globals.css v5.2.47 */
+/* src/app/globals.css v5.2.61 */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -12,8 +12,8 @@
 
 /* ==================== 设计系统 Token ==================== */
 @theme {
-  /* 字体 */
-  --font-serif: 'Noto Serif SC', Georgia, serif;
+  /* 字体：中文衬线走系统栈，覆盖 macOS/Windows/Linux；不再由 next/font 的 latin 子集占用该变量 */
+  --font-serif: 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Source Han Serif SC', 'SimSun', Georgia, serif;
   --font-display: 'Playfair Display', Georgia, serif;
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;

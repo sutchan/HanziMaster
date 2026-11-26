@@ -25,17 +25,33 @@ for (const locale of expected) {
   if (!site.includes(`'${locale}'`)) errors.push(`site.ts missing locale: ${locale}`);
 }
 
-const extensionModules = ['legal', 'a11y', 'meanings', 'settings', 'privacy', 'pwa', 'progress', 'seo', 'geo', 'cloud'];
+const extensionModules = [
+  'a11y', 'cloud', 'geo', 'legal', 'meanings', 'privacy', 'progress', 'pwa', 'quiz', 'seo', 'settings',
+];
+const byLocaleDir = path.join(root, 'extensions', 'by-locale');
 for (const module of extensionModules) {
   const file = path.join(root, 'extensions', `${module}.ts`);
-  if (!fs.existsSync(file)) {
-    errors.push(`missing extension module: extensions/${module}.ts`);
-    continue;
+  if (!fs.existsSync(file)) errors.push(`missing extension module: extensions/${module}.ts`);
+}
+// OPT-02：扩展数据改为 per-locale 模块，lint 直接校验每个语言的全部模块片段
+const byLocaleSources = Object.fromEntries(
+  expected.map((locale) => {
+    const file = path.join(byLocaleDir, `${locale}.ts`);
+    if (!fs.existsSync(file)) {
+      errors.push(`missing locale extensions: extensions/by-locale/${locale}.ts`);
+      return [locale, ''];
+    }
+    return [locale, fs.readFileSync(file, 'utf8')];
+  }),
+);
+for (const locale of expected) {
+  const source = byLocaleSources[locale];
+  if (!source.includes('export const extensions')) {
+    errors.push(`by-locale/${locale}.ts missing extensions export`);
   }
-  const source = fs.readFileSync(file, 'utf8');
-  for (const locale of expected) {
-    if (!source.includes(`'${locale}':`) && !source.includes(`  ${locale}:`)) {
-      errors.push(`extensions/${module}.ts missing locale: ${locale}`);
+  for (const module of extensionModules) {
+    if (!new RegExp(`^  ${module}:\\s*\\{`, 'm').test(source)) {
+      errors.push(`by-locale/${locale}.ts missing extension module: ${module}`);
     }
   }
 }
@@ -57,14 +73,18 @@ const collectByKey = (source) => {
 const collectAll = (source) =>
   [...new Set([...source.matchAll(PLACEHOLDER)].map((m) => m[1]))].sort().join(',');
 
-/** 扩展模块是 en: {...} / 'zh-CN': {...} 结构，按顶层 locale 块分别收集占位符。 */
-const collectExtensionBlocks = (source) => {
+/** by-locale/<locale>.ts 是 a11y: {...} / cloud: {...} 结构，按顶层模块块收集键与占位符。 */
+const collectExtensionFragments = (source) => {
   const blocks = new Map();
-  const matches = [...source.matchAll(/^\s{2}('?)([\w-]+)\1:\s*\{/gm)];
-  matches.forEach((m, i) => {
-    const start = m.index + m[0].length;
-    const end = i + 1 < matches.length ? matches[i + 1].index : source.length;
-    blocks.set(m[2], collectAll(source.slice(start, end)));
+  const matches = [...source.matchAll(/^  (\w+):\s*\{/gm)];
+  matches.forEach((match, index) => {
+    const start = match.index + match[0].length;
+    const end = index + 1 < matches.length ? matches[index + 1].index : source.length;
+    const text = source.slice(start, end);
+    // 先抹掉字符串字面量，避免文案里的 "browser:" 之类被误判为对象键
+    const structure = text.replace(/"(?:[^"\\]|\\.)*"/g, '""').replace(/'(?:[^'\\]|\\.)*'/g, "''");
+    const keys = [...structure.matchAll(/(?:^|[\s,{])([\w'-]+):/g)].map((key) => key[1]).sort().join(',');
+    blocks.set(match[1], { keys, placeholders: collectAll(text) });
   });
   return blocks;
 };
@@ -82,13 +102,18 @@ for (const locale of expected) {
   }
 }
 
-// 扩展模块此前只检查语言块存在，不检查占位符；此处补齐
+// 扩展模块：按语言 × 模块双层校验键集合与占位符集合，避免英文回退掩盖缺键
 for (const module of extensionModules) {
-  const blocks = collectExtensionBlocks(fs.readFileSync(path.join(root, 'extensions', `${module}.ts`), 'utf8'));
-  const baseline = blocks.get('en') ?? '';
+  const baseline = collectExtensionFragments(byLocaleSources.en).get(module);
+  if (!baseline) continue;
   for (const locale of expected) {
-    if ((blocks.get(locale) ?? '') !== baseline) {
-      errors.push(`extensions/${module}.ts ${locale} placeholder mismatch: expected [${baseline}], got [${blocks.get(locale) ?? ''}]`);
+    const fragment = collectExtensionFragments(byLocaleSources[locale]).get(module);
+    if (!fragment) continue;
+    if (fragment.keys !== baseline.keys) {
+      errors.push(`by-locale/${locale}.ts ${module} key mismatch: expected [${baseline.keys}], got [${fragment.keys}]`);
+    }
+    if (fragment.placeholders !== baseline.placeholders) {
+      errors.push(`by-locale/${locale}.ts ${module} placeholder mismatch: expected [${baseline.placeholders}], got [${fragment.placeholders}]`);
     }
   }
 }

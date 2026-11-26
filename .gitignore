@@ -89,4 +89,5 @@ yarn-error.log*
 .idea
 *.txt
 .codebuddy/
-e2e/
+# Playwright 用例是正式测试资产，不能被临时目录规则忽略
+!e2e/

@@ -8,7 +8,7 @@ export const extensions: LocaleExtensions = {
     learn: { strokeDemoLabel: '筆順示範區域' },
     practice: { canvasLabel: '田字格書寫畫布', keyboardLabel: '筆順輸入（鍵盤替代路徑）', keyboardHint: '依序輸入筆畫編號，例如 1 2 3，以空格或逗號分隔。' },
   },
-  cloud: { title: '雲端同步', desc: '請妥善保管同步碼——任何持有它的人都能存取你的學習進度。', code: '同步碼', generate: '產生', copy: '複製', upload: '上傳到雲端', download: '從雲端還原', uploadDone: '進度已上傳', downloadDone: '進度已還原', failed: '雲端同步失敗', notConfigured: '雲端同步暫不可用', noProgress: '本機暫無可上傳的進度' },
+  cloud: { title: '雲端同步', desc: '請妥善保管同步碼——任何持有它的人都能存取你的學習進度。', code: '同步碼', generate: '產生', copy: '複製', upload: '上傳到雲端', download: '從雲端還原', uploadDone: '進度已上傳', downloadDone: '進度已還原', failed: '雲端同步失敗', notConfigured: '雲端同步暫不可用', noProgress: '本機暫無可上傳的進度', copyFailed: '複製失敗——同步碼已選取，請按 Ctrl/Cmd+C 手動複製', confirmTitle: '取代目前同步碼？', confirmDesc: '產生新同步碼後，舊雲端進度將無法存取。確定繼續嗎？', confirmOk: '取代並複製', errors: { notConfigured: '雲端同步暫不可用', invalidJson: '要求資料格式無效', invalidCode: '同步碼無效', invalidBackup: '備份資料無效', rateLimited: '要求過於頻繁，請稍後再試', usePost: '雲端同步要求請使用 POST 方法', notFound: '此同步碼尚無雲端進度', tooLarge: '備份資料超過大小限制', emptyBackup: '雲端備份中沒有進度資料', emptyProgress: '拒絕用空進度覆寫雲端資料', readFailed: '讀取雲端進度失敗', writeFailed: '寫入雲端進度失敗' } },
   geo: {
     factsTitle: '關於 HanziMaster',
     factsLead:

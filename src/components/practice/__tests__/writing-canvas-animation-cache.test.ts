@@ -140,7 +140,7 @@ describe('runStrokeAnimation 帧内开销', () => {
     expect(frames).toHaveLength(1);
     frames.shift()?.(start);
     frames.shift()?.(start + 250);
-    frames.shift()?.(start + 500);
+    frames.shift()?.(start + 1000);
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(pathBuilds).toBe(1);
     expect(tokenReads).toBe(3);

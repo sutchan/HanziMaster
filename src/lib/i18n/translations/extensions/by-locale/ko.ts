@@ -8,7 +8,7 @@ export const extensions: LocaleExtensions = {
     learn: { strokeDemoLabel: '획순 시연 영역' },
     practice: { canvasLabel: '쓰기 캔버스', keyboardLabel: '획순 입력 (키보드 대체 경로)', keyboardHint: '획 번호를 순서대로 입력하세요. 예: 1 2 3 (공백 또는 쉼표로 구분).' },
   },
-  cloud: { title: '클라우드 동기화', desc: '동기화 코드는 비밀로 유지하세요. 코드를 가진 사람은 누구나 진행 상황에 접근할 수 있습니다.', code: '동기화 코드', generate: '생성', copy: '복사', upload: '클라우드에 업로드', download: '클라우드에서 복원', uploadDone: '진행 상황을 업로드했습니다', downloadDone: '진행 상황을 복원했습니다', failed: '동기화에 실패했습니다', notConfigured: '클라우드 동기화를 사용할 수 없습니다', noProgress: '업로드할 로컬 진행 상황이 없습니다' },
+  cloud: { title: '클라우드 동기화', desc: '동기화 코드는 비밀로 유지하세요. 코드를 가진 사람은 누구나 진행 상황에 접근할 수 있습니다.', code: '동기화 코드', generate: '생성', copy: '복사', upload: '클라우드에 업로드', download: '클라우드에서 복원', uploadDone: '진행 상황을 업로드했습니다', downloadDone: '진행 상황을 복원했습니다', failed: '동기화에 실패했습니다', notConfigured: '클라우드 동기화를 사용할 수 없습니다', noProgress: '업로드할 로컬 진행 상황이 없습니다', copyFailed: '복사하지 못했습니다. 코드가 선택되어 있으니 Ctrl/Cmd+C로 수동 복사하세요', confirmTitle: '현재 동기화 코드를 교체할까요?', confirmDesc: '새 코드를 만들면 기존 클라우드 진행 상황에 접근할 수 없습니다. 계속할까요?', confirmOk: '교체하고 복사', errors: { notConfigured: '클라우드 동기화를 사용할 수 없습니다', invalidJson: '요청 데이터가 올바르지 않습니다', invalidCode: '동기화 코드가 올바르지 않습니다', invalidBackup: '백업 데이터가 올바르지 않습니다', rateLimited: '요청이 너무 많습니다. 잠시 후 다시 시도하세요', usePost: '동기화 요청에는 POST를 사용하세요', notFound: '이 코드에 대한 클라우드 진행 상황이 없습니다', tooLarge: '백업이 크기 제한을 초과했습니다', emptyBackup: '클라우드 백업에 진행 상황이 없습니다', emptyProgress: '빈 데이터로 클라우드 진행 상황을 덮어쓸 수 없습니다', readFailed: '클라우드 진행 상황을 읽지 못했습니다', writeFailed: '클라우드 진행 상황을 쓰지 못했습니다' } },
   geo: {
     factsTitle: 'HanziMaster 소개',
     factsLead:
