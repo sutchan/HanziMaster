@@ -1,10 +1,10 @@
-﻿# HanziMaster 汉字大师 v5.2.60
+﻿# HanziMaster 汉字大师 v5.2.61
 
 [English](README_EN.md) | [简体中文](README.md)
 
 [![CI](https://github.com/Tanox/HanziMaster/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanox/HanziMaster/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Node](https://img.shields.io/badge/node-%E2%89%A524.11.0-339933)
+![Node](https://img.shields.io/badge/node-24.11.0-339933)
 ![pnpm](https://img.shields.io/badge/pnpm-%E2%89%A511-F9AD00)
 ![Next.js](https://img.shields.io/badge/Next.js-16.4.4-black)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
@@ -37,7 +37,7 @@
 
 | 工具 | 要求 | 说明 |
 |------|------|------|
-| Node.js | `>= 24.11.0` | `.nvmrc` 锁定 `24.11.0` |
+| Node.js | `24.11.0` | `package.json` `engines.node` 精确锁定，与 `.nvmrc` 一致 |
 | 包管理器 | pnpm `>= 11` | 强制（`preinstall: npx only-allow pnpm`、`.npmrc`） |
 | 浏览器 | Chrome / Firefox / Safari / Edge 最新版 | 开发与测试 |
 
@@ -184,4 +184,4 @@ CSP 与安全响应头由 `next.config.mjs` 的 `headers()` 统一注入；`src/
 
 本项目按 [MIT 许可证](LICENSE) 发布；第三方依赖许可见 [NOTICE](NOTICE)。贡献与安全报告流程见 [CONTRIBUTING.md](CONTRIBUTING.md)、[CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md)、[SECURITY.md](.github/SECURITY.md)、[SUPPORT.md](.github/SUPPORT.md) 与 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md)。
 
-© 2026 HanziMaster 汉字大师 v5.2.60
+© 2026 HanziMaster 汉字大师 v5.2.61

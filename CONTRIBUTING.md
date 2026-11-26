@@ -17,7 +17,7 @@ pnpm install
 pnpm dev
 ```
 
-- Node.js `>= 24.11.0`、pnpm `>= 11`（锁定 `11.24.0`），项目强制 pnpm，`npm install` / `yarn` 会被 `preinstall` 钩子拦截。
+- Node.js `24.11.0`（精确锁定，避免 Vercel 在新 major 发布时自动升级）、pnpm `>= 11`（锁定 `11.24.0`），项目强制 pnpm，`npm install` / `yarn` 会被 `preinstall` 钩子拦截。
 - 开发服务器默认 `http://localhost:3000`；应用无需环境变量。
 - 完整环境说明与命令表见 [docs/03-development.md](docs/03-development.md)。
 

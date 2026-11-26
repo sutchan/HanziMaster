@@ -1,6 +1,6 @@
 # 开发指南
 
-> 文档版本：v5.2.58（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
 
 本文负责**开发环境、命令表与日常流程**。编码风格、命名、目录组织、设计 token、i18n、版本号与质量门禁的唯一权威是 [coding-standards.md](coding-standards.md)；提交、分支与审查见 [git-workflow.md](git-workflow.md)。
 
@@ -8,7 +8,7 @@
 
 | 工具 | 要求 | 依据 |
 |------|------|------|
-| Node.js | `>= 24.11.0` | `package.json` `engines` / `.nvmrc`（`24.11.0`） |
+| Node.js | `24.11.0`（精确锁定） | `package.json` `engines.node` / `.nvmrc`，避免 Vercel 跨 major 自动升级 |
 | pnpm | `>= 11`，锁定 `pnpm@11.24.0` | `packageManager` / `.npmrc` `package-manager-strict` |
 | 浏览器 | Chrome / Firefox / Safari / Edge 最新两个主要版本 | 开发与手工验证 |
 

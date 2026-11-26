@@ -1,6 +1,6 @@
 # 部署指南
 
-> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
 
 本文描述项目的部署配置与上线流程。构建前的完整质量门禁见 [coding-standards.md](coding-standards.md) §11，发版与自动发布流程见 [git-workflow.md](git-workflow.md) §6 与 §6.1。
 
@@ -13,7 +13,7 @@
 
 共同约束：
 
-- **运行时**：Node.js `>= 24.11.0`（`.nvmrc` 锁定 `24.11.0`），pnpm `>= 11`（`packageManager: pnpm@11.24.0`）。Vercel 的 Node 版本是**项目设置**，`vercel.json` 不支持 `nodeVersion` 键；`prebuild` 的 `scripts/check-runtime.mjs` 会在构建最早期校验 Node 版本并给出可操作错误。
+- **运行时**：Node.js `24.11.0`（`package.json` `engines.node` 精确锁定，与 `.nvmrc` 一致），pnpm `>= 11`（`packageManager: pnpm@11.24.0`）。Vercel 的 Node 版本是**项目设置**，`vercel.json` 不支持 `nodeVersion` 键；`prebuild` 的 `scripts/check-runtime.mjs` 会在构建最早期校验 Node 版本并给出可操作错误。
 - **包管理器**：项目强制 pnpm（`preinstall: npx only-allow pnpm`，`.npmrc` 设 `engine-strict` / `package-manager-strict`）。开发者侧命令一律 `pnpm`；仅 `edgeone.json` 内的 `npm run build` 是构建平台内部命令，见 §3。
 - **环境变量**：核心页面运行**不需要任何环境变量**；生产建议配置 `NEXT_PUBLIC_SITE_URL`，可选启用 GA4 / Sentry / Vercel Blob 云同步（Blob 凭证用应用自有变量名 `BLOB_HANZI_STORE_ID` / `BLOB_HANZI_READ_WRITE_TOKEN`，完整清单见 [01-overview.md](01-overview.md) §7）。`.env.local` 仅供本地可选配置，不提交仓库。
 - **联网资源**：`next/font/google` 需访问 Google Fonts（Space Grotesk / Playfair Display / Noto Serif SC / JetBrains Mono）。离线/沙箱环境构建可能因字体下载失败，属环境限制而非代码缺陷，部署平台需允许该域名。
@@ -69,7 +69,8 @@
 
 1. 将代码推送到 Git 仓库。
 2. 在 EdgeOne Pages 控制台创建应用并关联仓库。
-3. **在「环境变量 / Environment Variables」添加 `NEXT_PUBLIC_SITE_URL=https://<正式域名>`（必填，无尾斜杠、无 query/hash、无 path）**。`next.config.mjs` 在生产构建（含 EdgeOne 的 `npm run build`）会 fail-closed 校验：漏配或非法直接报 `NEXT_PUBLIC_SITE_URL must be a valid absolute http(s) URL...` 并退出 1，防止 canonical / hreflang / `sitemap.xml` / `robots.txt` 全部指向 `localhost`。`.env.local` 不入库、平台构建读不到，必须在控制台配置；示例报错中的 `https://hanzi.ewuse.com` 即当前正式域名。
+3. **在「环境变量 / Environment Variables」添加 `NEXT_PUBLIC_SITE_URL=https://<正式域名>`（无尾斜杠、无 query/hash、无 path）**。`next.config.mjs` 在生产构建会 fail-closed 校验：非法值直接报 `NEXT_PUBLIC_SITE_URL must be a valid absolute http(s) URL...` 并退出 1，防止 canonical / hreflang / `sitemap.xml` / `robots.txt` 全部指向 `localhost`。`.env.local` 不入库、平台构建读不到；示例报错中的 `https://hanzi.ewuse.com` 即当前正式域名。
+   - **兜底机制**：若平台未配置该变量，`pnpm build` 的前置步骤 `scripts/prepare-site-url.mjs` 会写入 `.env.production.local`（值 `https://hanzi.ewuse.com`）保证构建通过。该文件被 `.gitignore` 忽略；**显式环境变量始终优先且不会被覆盖**。换域名时必须显式配置环境变量，不要依赖兜底。
 4. 确认上述 `installCommand` / `buildCommand` / `nodeVersion` 生效；输出目录按平台 Next.js 预设（`.next`），不要改成静态站点目录。
 5. 触发部署，检查构建日志中字体下载与 CSP 响应头。
 6. 绑定自定义域名与 HTTPS（可选）；若正式域名与步骤 3 的值不同，须同步更新该环境变量并重新构建。

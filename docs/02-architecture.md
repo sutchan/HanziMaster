@@ -1,6 +1,6 @@
 # 技术架构
 
-> 文档版本：v5.2.51（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
 
 本文描述**当前代码的实际架构**。组件 API 见 [04-api-reference.md](04-api-reference.md)，设计系统见 [07-design-prototype.md](07-design-prototype.md)，编码约束见 [coding-standards.md](coding-standards.md)。
 
@@ -101,7 +101,7 @@
 
 ## 7. 测试与质量
 
-Vitest + jsdom，测试就近放在各模块 `__tests__/`，当前 **36 个单测文件**（192 用例，以实测为准）；`i18n.test.ts` 校验 11 语言叶子键一致。另有 Playwright E2E（`e2e/`，含 axe 无障碍断言）与覆盖率阈值门禁（`@vitest/coverage-v8`，80/70/80/80）。质量门禁（类型检查 / lint / 单测 / 行数 / 审计 / 构建 / 体积 / i18n / 版本展示位）见 [coding-standards.md](coding-standards.md) §11，测试细节见 [06-testing.md](06-testing.md)；CI 工作流见 [05-deployment.md](05-deployment.md) §6。
+Vitest + jsdom，测试就近放在各模块 `__tests__/`，当前 **36 个单测文件**（197 用例，以实测为准）；`i18n.test.ts` 校验 11 语言叶子键一致。Playwright 与 `@axe-core/playwright` 依赖已安装，但**尚无** `e2e/` 目录与 `test:e2e` 脚本（OPT-09）；覆盖率阈值门禁已配置（`@vitest/coverage-v8`，80/70/80/80）。质量门禁（类型检查 / lint / 单测 / 行数 / 审计 / 构建 / 体积 / i18n / 版本展示位）见 [coding-standards.md](coding-standards.md) §11，测试细节见 [06-testing.md](06-testing.md)；CI 工作流见 [05-deployment.md](05-deployment.md) §6。
 
 ## 8. 技术选型理由
 
@@ -113,6 +113,28 @@ Vitest + jsdom，测试就近放在各模块 `__tests__/`，当前 **36 个单�
 | 自定义 i18n | 11 语言静态包 + `TranslationKey` 编译期约束，无运行时依赖 |
 | localStorage | 本地优先、离线可用、无账户与后端成本 |
 | Vitest + Testing Library | 与 Vite 生态一致，jsdom 覆盖组件与交互路径 |
+
+## 8.1 部署拓扑与运行时边界
+
+```mermaid
+flowchart LR
+    U[浏览器] -->|静态资源 / RSC| P[Vercel 或 EdgeOne OpenNext]
+    U -->|POST code+backup| A[/api/progress]
+    P --> M[src/proxy.ts 中间件<br/>语言协商 + rewrite]
+    P --> R[App Router 页面<br/>RSC + Client 组件]
+    A --> B[(Vercel Blob 私有 store<br/>未配置则 503 → 本地降级)]
+    U -.localStorage / storage 事件.-> L[(本机进度 / 设置 / 主题)]
+    P --> O[Sentry / GA4<br/>需显式配置 + 同意]
+```
+
+运行时边界：
+
+- **边缘/服务端**：`src/proxy.ts`（纯 `@/lib/site` 常量，无 `node:` 依赖）与 `/api/progress`（同步码校验、限流、Blob 读写）；二者构成唯一服务端逻辑。
+- **客户端**：Theme → Locale → Tooltip → LayoutClient → Toast 五层 Provider；状态以 React Context + localStorage 为主（拆分建议见 [10-optimization-roadmap.md](10-optimization-roadmap.md) OPT-06/08）。
+- **静态资源**：字体经 `next/font/google` 在构建期下载；PWA `public/sw.js` + `offline.html` 提供离线兜底。
+- **外部依赖**：仅 Google Fonts（构建期）、可选 GA4 / Sentry / Vercel Blob；无 AI 后端、无数据库、无用户账户体系。
+
+部署平台必须按 Next.js 应用（而非纯静态站点）托管，否则中间件与 API 路由失效；详见 [05-deployment.md](05-deployment.md) §4。
 
 ## 9. 相关文档
 

@@ -1,6 +1,6 @@
 # API 参考
 
-> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
 
 本文列出应用内部**公开模块与组件的真实签名**。类型与导出以源码为准；本文只做稳定契约说明，不逐字复制实现。设计 token 完整色板见 [07-design-prototype.md](07-design-prototype.md)，编码用法见 [coding-standards.md](coding-standards.md)。
 
@@ -171,30 +171,56 @@ export function Example() {
 
 ## 10. HTTP 端点
 
-| 端点 | 方法 | 响应 |
-|------|------|------|
-| `/api/health` | `GET` | `{ status: 'ok', version, build }`；`version` / `build` 取 `NEXT_PUBLIC_APP_VERSION` / `NEXT_PUBLIC_BUILD_ID`，未注入时为 `unknown`。用于部署后健康探测，无鉴权、无副作用。 |
-| `/api/progress` | `POST` | 云端进度同步。请求体 `{ code, backup? }`：`code` 为 32 位十六进制同步码，`backup` 省略时读、携带时写（复用 `createProgressBackup` 格式）。私有 Vercel Blob store，未配置 `BLOB_HANZI_READ_WRITE_TOKEN` / `BLOB_HANZI_STORE_ID` 时返回 `503 not_configured`，前端降级为纯 localStorage。无用户账户，同步码即凭证，须保密。 |
+机器可读规范见 [openapi.yaml](openapi.yaml)（OpenAPI 3.1，唯一权威源）；本节为文字镜像。
 
-`/api/health` 用于部署探测；`/api/progress` 是唯一的业务数据端点（可选云同步）。
+| 端点 | 方法 | 响应 | 鉴权 |
+|------|------|------|------|
+| `/api/health` | `GET` | `200 { status, version, build, timestamp }`，无错误分支 | 无 |
+| `/api/progress` | `POST` | 读 `200 { backup }` / 写 `200 { ok: true }` | 同步码（仅请求体） |
+| `/api/progress` | `GET` | `405 use_post`（旧 `?code=` 通道已永久关闭） | — |
+| `/llms.txt` | `GET` | `200 text/plain`（GEO 事实摘要，静态生成） | 无 |
 
-**示例**（把 `<SYNC_CODE>` 替换为 32 位十六进制同步码；`backup` 是 `createProgressBackup()` 返回的 **JSON 字符串**，不是对象）：
+`/api/progress` 请求体为 `{ code, backup? }`：`code` 是 32 位小写十六进制同步码；**省略 `backup` 表示读取，携带非空字符串表示写入**。`backup` 必须是 `createProgressBackup()` 返回的 **JSON 字符串**，不是对象。未配置 `BLOB_HANZI_READ_WRITE_TOKEN` / `BLOB_HANZI_STORE_ID` 时返回 `503 not_configured`，客户端降级为纯 localStorage。无用户账户，同步码即凭证（等同于密码），须保密。
+
+### 10.1 错误码对照
+
+错误响应统一为 `{ "error": <code>, "message": <英文固定文案> }`；客户端必须按 `error` 分支，不得解析 `message`。
+
+| HTTP | `error` | 含义 | 客户端处置 |
+|------|---------|------|-----------|
+| 400 | `invalid_json` | 请求体不是合法 JSON | 提示请求格式错误，不重试 |
+| 400 | `invalid_code` | 同步码不是 32 位小写 hex | 提示重新生成同步码 |
+| 400 | `invalid_backup` | `backup` 缺失、非字符串或为空 | 检查备份内容后重试 |
+| 404 | `not_found` | 该同步码无云端备份 | 提示「暂无云端进度」 |
+| 413 | `too_large` | 备份超过 4 MB | 提示本地导出后清理历史记录 |
+| 429 | `rate_limited` | 超过 30 次/分钟；带 `Retry-After: 60` | 60 秒后重试 |
+| 502 | `empty_backup` / `empty_progress` / `read_failed` / `write_failed` | 云端数据为空或读写失败 | 提示稍后重试，保留本地进度 |
+| 503 | `not_configured` | 未配置 Blob 凭证 | 降级为纯本地进度，不提示为用户错误 |
+| 405 | `use_post` | 使用了旧 GET 通道 | 改用 POST |
+
+> `not_configured` / `invalid_json` / `use_post` 尚无专用 `message` 映射，走 fallback `Cloud sync request failed`；见 [10-optimization-roadmap.md](10-optimization-roadmap.md) OPT-12。
+
+### 10.2 调用示例
 
 ```bash
 curl -s https://example.com/api/health
-# {"status":"ok","version":"5.2.50","build":"2611201800"}
+# {"status":"ok","version":"5.2.61","build":"2611231000","timestamp":"..."}
 
-curl -s 'https://example.com/api/progress?code=<SYNC_CODE>'
-# 成功：{"backup":"{\"version\":1,\"exportedAt\":...,\"progress\":{...}}"}
-# 未配置：503 {"error":"not_configured",...}；无备份：404；同步码非法：400
-
-curl -s -X PUT https://example.com/api/progress \
+# 读取：POST + 仅 code（不要使用 GET ?code=）
+curl -s -X POST https://example.com/api/progress \
   -H 'Content-Type: application/json' \
-  -d '{"code":"<SYNC_CODE>","backup":"<由 createProgressBackup() 生成的 JSON 字符串>"}'
-# 成功：{"ok":true}；空进度被拒绝：400 empty_progress；写入失败：502
+  -d '{"code":"9f2c1a0b7d6e4f385a2b1c0d9e8f7a6b"}'
+# {"backup":"{\"version\":1,\"exportedAt\":...,\"progress\":{...}}"}
+# 503 not_configured / 404 not_found / 400 invalid_code / 429 rate_limited
+
+# 写入：POST + code + backup（JSON 字符串）
+curl -s -X POST https://example.com/api/progress \
+  -H 'Content-Type: application/json' \
+  -d '{"code":"9f2c1a0b7d6e4f385a2b1c0d9e8f7a6b","backup":"{\"version\":1,\"progress\":{}}"}'
+# {"ok":true}；空进度被拒绝 400 empty_progress；写入失败 502 write_failed
 ```
 
-> 两个端点均返回 `Cache-Control: no-store`。同步码即凭证，不要写入日志或提交到仓库。
+> 所有端点返回 `Cache-Control: no-store`。同步码即凭证，不要写入日志、URL 或仓库。
 
 ## 11. 样式与主题 token
 

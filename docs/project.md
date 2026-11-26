@@ -1,6 +1,6 @@
 # Project Context
 
-> Document version: v5.2.60 (single source of truth: `package.json`)
+> Document version: v5.2.61 (single source of truth: `package.json`)
 
 This file is the English project context consumed by AI tooling. It is a **summary only**: the authoritative rules live in [coding-standards.md](coding-standards.md), [commit-template.md](commit-template.md), [git-workflow.md](git-workflow.md) and [index.md](index.md). If this file conflicts with them, fix this file.
 
@@ -17,7 +17,7 @@ HanziMaster (汉字大师) is a local-first web app centered on **practicing Chi
 - **i18n**: custom `LocaleProvider` context, 11 language packs in `src/lib/i18n/translations/`, `t()` constrained by the `TranslationKey` dotted union, `{{name}}` interpolation via `src/lib/i18n/translate.ts`.
 - **State**: React Context (`ThemeProvider`, `LocaleProvider`) + `useProgress`; persistence through `src/lib/storage.ts` over `window.localStorage` (versioned + schema-validated).
 - **Testing**: Vitest `^3.2.4` + jsdom `^30.1.3` + `@testing-library/react ^16.3.3` + `@vitest/coverage-v8` (thresholds 80/70/80/80, logic-layer scope); 24 unit test files plus Playwright E2E (`e2e/`, `@axe-core/playwright`). Case counts: see [06-testing.md](06-testing.md).
-- **Tooling**: pnpm `11.24.0` (enforced by `preinstall` + `.npmrc`), Node `>= 24.11.0`, ESLint 9 flat config, `prettier ^3.9.10` installed (`pnpm format` works).
+- **Tooling**: pnpm `11.24.0` (enforced by `preinstall` + `.npmrc`), Node `24.11.0` (exact pin), ESLint 9 flat config, `prettier ^3.9.10` installed (`pnpm format` works).
 - **Deployment**: Vercel (`vercel.json`) / Tencent Cloud EdgeOne Pages (`edgeone.json`).
 
 ## Project Conventions

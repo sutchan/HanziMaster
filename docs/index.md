@@ -1,8 +1,8 @@
 ﻿# HanziMaster 文档中心
 
-> 文档版本：v5.2.57（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
 
-本目录是项目**规范文档的唯一存放位置**（`docs/` 共 18 篇）。本文给出文档分层、单一职责矩阵、术语与格式约定；根级 README / CONTRIBUTING 只是入口摘要，不另立规则。
+本目录是项目**规范文档的唯一存放位置**（`docs/` 共 23 篇 Markdown + 1 份 OpenAPI 规范）。本文给出文档分层、单一职责矩阵、术语与格式约定；根级 README / CONTRIBUTING 只是入口摘要，不另立规则。
 
 ## 1. 文档分层
 
@@ -27,8 +27,12 @@
 | [01-overview.md](01-overview.md) | 项目定位、功能范围、技术栈版本、仓库目录树 | 编码规则细则、任务 |
 | [02-architecture.md](02-architecture.md) | 架构分层、模块职责、数据流、技术选型理由 | API 参数表、部署步骤 |
 | [03-development.md](03-development.md) | 环境搭建、命令表、日常开发流程、版本注入链路 | 命名/格式规则细则（→ 编码规范） |
-| [04-api-reference.md](04-api-reference.md) | 组件 / hooks / i18n 模块公开 API 与类型 | 设计 token 完整色板（→ 设计规范） |
+| [04-api-reference.md](04-api-reference.md) | 组件 / hooks / i18n 模块公开 API 与类型 | HTTP 端点的机器可读规范（→ `openapi.yaml`）、设计 token 完整色板（→ 设计规范） |
+| [openapi.yaml](openapi.yaml) | HTTP 端点 OpenAPI 3.1 规范（路径 / 方法 / 参数 / 响应 / 错误码 / 示例） | 组件 API（→ 04）、文字叙述重复 |
 | [05-deployment.md](05-deployment.md) | Vercel / EdgeOne 配置与部署、上线检查 | 质量门禁定义（→ 编码规范） |
+| [08-user-guide.md](08-user-guide.md) | 面向最终用户的角色与权限、操作流程图、分步骤 | 开发者 API、任务清单 |
+| [09-faq-troubleshooting.md](09-faq-troubleshooting.md) | FAQ、症状速查、故障排除（用户/开发/部署） | 优化建议（→ 10）、任务（→ tasks.md） |
+| [10-optimization-roadmap.md](10-optimization-roadmap.md) | 四维评估后的优化建议与未来展望（背景/方案/效果/优先级） | 当前待办（→ tasks.md）、已完成项（→ tasks-done.md） |
 | [06-testing.md](06-testing.md) | Vitest 配置、测试组织、编写与覆盖率现状 | 门禁命令定义（→ 编码规范） |
 | [07-design-prototype.md](07-design-prototype.md) | 设计系统、色板/字体/间距/动效、原型文件索引 | 代码实现细节 |
 | **[coding-standards.md](coding-standards.md)** | **编码风格、命名约定、目录组织、token 使用、i18n、行数、版本同步、质量门禁** | 分支与审查流程 |
@@ -56,6 +60,10 @@
 **发版前**：[coding-standards.md](coding-standards.md) §3 → [git-workflow.md](git-workflow.md) §6 → [05-deployment.md](05-deployment.md)。
 
 **设计/原型**：[07-design-prototype.md](07-design-prototype.md)（权威设计系统）+ `prototype/prototype.html`（唯一权威高保真原型）+ `prototype/DESIGN_SPEC.md`。
+
+**产品/用户**：[01-overview.md](01-overview.md)（定位与目标）→ [08-user-guide.md](08-user-guide.md)（操作指南）→ [09-faq-troubleshooting.md](09-faq-troubleshooting.md)（FAQ 与排障）→ [10-optimization-roadmap.md](10-optimization-roadmap.md)（优化建议与未来展望）。
+
+**接口对接**：[openapi.yaml](openapi.yaml)（机器可读规范）→ [04-api-reference.md](04-api-reference.md) §10（文字镜像与错误码）。
 
 ## 4. 术语与格式约定
 
@@ -87,7 +95,7 @@
 
 ## 5. 版本戳规则
 
-- 产品版本的唯一权威源是 `package.json` 的 `version`（本次修订时为 `5.2.52`）。文档版本戳只是「该文档最后修订时对应的项目版本」的展示位，**不是第二权威源**。
+- 产品版本的唯一权威源是 `package.json` 的 `version`（本次修订时为 `5.2.61`）。文档版本戳只是「该文档最后修订时对应的项目版本」的展示位，**不是第二权威源**。
 - **只更新本次实际改动的文档**的版本戳；未改动文档保留原戳是合法的，不得为了「看起来一致」批量刷写全部文档。
 - 全局展示位（`package.json` / `metadata.json` / `README.md` / `README_EN.md` / `CHANGELOG.md`）每次发版必须同步，见 [coding-standards.md](coding-standards.md) §3。
 - 发版前用 `node -e "console.log(require('./package.json').version)"` 实查真实版本，勿按会话记忆或旧快照填写。

@@ -1,7 +1,7 @@
 {
-  "name": "HanziMaster 汉字大师 v5.2.60",
-  "version": "5.2.60",
-  "description": "v5.2.60: 产品定位对齐「练习写汉字」——11 语言首页文案从「精通中文」改为练字主线，主 CTA 直达 /practice 书写练习、次 CTA 指向 /learn 字库；README 与项目文档定位同步。",
+  "name": "HanziMaster 汉字大师 v5.2.61",
+  "version": "5.2.61",
+  "description": "v5.2.61: 修复 Vercel 部署警告——engines.node 由范围 >=24.11.0 改为精确 24.11.0，与 .nvmrc / CI / EdgeOne 一致；README×2 徽章与全部文档版本声明同步。",
   "keywords": [
     "Chinese characters",
     "Hanzi",

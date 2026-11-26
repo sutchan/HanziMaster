@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## [5.2.61] - 修复 Vercel Node 版本自动升级警告
+### Fix
+- `package.json` `engines.node` 由 `>=24.11.0` 改为精确 `24.11.0`，消除 Vercel 构建警告「will automatically upgrade when a new major Node.js Version is released」；与 `.nvmrc`、`ci.yml` / `deploy.yml` 的 `node-version: 24.11.0`、`edgeone.json` 的 `nodeVersion: 24.11.0` 全链路一致。
+- README / README_EN 的 Node 版本徽章由 `node-≥24.11.0` 改为 `node-24.11.0`；CONTRIBUTING / CONTRIBUTING_EN、`01-overview.md`、`03-development.md`、`05-deployment.md`、`project.md` 中的 Node 要求同步为精确 `24.11.0`。
+- 带审计基线的历史文档（`docs/vercel-deployment-audit.md` §6、`prototype/OPTIMIZATION_SUMMARY.md`）保留审计当时的记录，不改写历史快照。
+### Chore
+- 同步全局展示位至 v5.2.61（`package.json` / `metadata.json` / 双 README）。
+### Fix（文档体系批次）
+- **部署构建兜底**：新增 `scripts/prepare-site-url.mjs`，在 `pnpm build` 前置步骤中为未注入 `NEXT_PUBLIC_SITE_URL` 的构建环境写入 `.env.production.local` 兜底（`https://hanzi.ewuse.com`，显式环境变量与已有配置均优先，文件被 `.gitignore` 忽略）。解决平台构建链路漏配变量即 fail-closed 中断的问题；`docs/05-deployment.md` §3 已同步。
+- **API 文档矛盾**：`04-api-reference.md` §10 原示例同时出现 `GET ?code=`、`PUT`、`POST` 三种写法，与 `src/app/api/progress/route.ts` 仅支持 POST 的实现冲突；现统一为 POST，并补错误码对照表与调用示例。
+### Docs（文档体系批次）
+- 新增 `docs/openapi.yaml`（OpenAPI 3.1，3 端点全参数/响应/错误码/示例，作为 HTTP API 机器可读权威源）。
+- 新增 `docs/08-user-guide.md`（事实角色权限、mermaid 使用流程图、学习/书写/同步分步骤）。
+- 新增 `docs/09-faq-troubleshooting.md`（症状速查表 + 用户/开发/部署分栏 FAQ）。
+- 新增 `docs/10-optimization-roadmap.md`（代码实现/架构/性能/UX 四维评估，每条含背景、实施方案、量化指标与优先级）。
+
 ## [5.2.60] - 产品定位对齐「练习写汉字」
 ### Changed
 - **首页文案（11 语言）**：`home.heroTitle` 从「精通中文 / Master Chinese」改为「练习写汉字 / Practice Writing Chinese」；`home.aiBadge` 改为「田字格书写练习」；`home.heroDescription` 改为笔顺演示 → 田字格手写 → 拼音测验的练字主线；`home.aiInsightsTitle/Desc` 改为「笔顺演示」，`home.featuresTitle/Subtitle` 改为练字功能描述；`common.startLearning` 改为「开始练字 / Start Writing Practice」。文案长度均受 160 字符门禁约束。

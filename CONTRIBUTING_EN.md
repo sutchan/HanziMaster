@@ -17,7 +17,7 @@ pnpm install
 pnpm dev
 ```
 
-- Node.js `>= 24.11.0`, pnpm `>= 11` (pinned `11.24.0`). pnpm is enforced; `npm install` / `yarn` are blocked by the `preinstall` hook.
+- Node.js `24.11.0` (exact pin to avoid Vercel auto-upgrading on new major releases), pnpm `>= 11` (pinned `11.24.0`). pnpm is enforced; `npm install` / `yarn` are blocked by the `preinstall` hook.
 - Dev server: `http://localhost:3000`. No environment variables are required.
 - Full setup and script table: [docs/03-development.md](docs/03-development.md).
 
