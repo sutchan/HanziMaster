@@ -1,4 +1,4 @@
-// src/hooks/useSyncedStorage.ts v5.2.61
+// src/hooks/useSyncedStorage.ts v5.3.0
 // OPT-08：统一订阅 storage 与同页自定义事件，让设置/主题/语言/同步码多实例保持一致。
 'use client';
 

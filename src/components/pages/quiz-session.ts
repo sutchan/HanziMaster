@@ -1,4 +1,4 @@
-// src/components/pages/quiz-session.ts v5.2.61
+// src/components/pages/quiz-session.ts v5.3.0
 // OPT-18：学习页/练习页测验会话的显式 reducer；重进统一走 INITIAL 状态，避免旧结果与计时残留。
 
 export interface LearnQuizState {

@@ -1,4 +1,4 @@
-// src/hooks/__tests__/use-learn-quiz-session.test.ts v5.2.61
+// src/hooks/__tests__/use-learn-quiz-session.test.ts v5.3.0
 // OPT-18：重进后结果复位 + 自动关闭计时器清理（提前关闭 / 卸载均不留残留）。
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-// src/lib/api-errors.ts v5.2.61
+// src/lib/api-errors.ts v5.3.0
 // API 错误码单一来源：code → HTTP 状态 / i18n key / 英文兜底文案。服务端与客户端共用，禁止另行硬编码。
 import type { TranslationKey } from '@/lib/i18n';
 

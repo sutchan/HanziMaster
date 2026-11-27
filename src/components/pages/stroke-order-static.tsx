@@ -1,4 +1,4 @@
-// src/components/pages/stroke-order-static.tsx v5.2.61
+// src/components/pages/stroke-order-static.tsx v5.3.0
 // OPT-15：RSC 静态首帧——笔顺数据构建期内联，服务端直接输出完整字形 SVG，无 JS 依赖。
 import { strokeOrderData } from '@/lib/stroke-order-data';
 

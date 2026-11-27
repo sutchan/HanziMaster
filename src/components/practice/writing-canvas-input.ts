@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-input.ts v5.2.61
+// src/components/practice/writing-canvas-input.ts v5.3.0
 // 书写画布指针交互：笔顺引导与跟写交替、指针身份过滤与 DPR/尺寸同步（单一职责拆分，保证组件 ≤200 行）。
 
 import type { PointerEvent as ReactPointerEvent } from 'react';

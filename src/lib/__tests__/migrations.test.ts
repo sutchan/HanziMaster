@@ -1,4 +1,4 @@
-// src/lib/__tests__/migrations.test.ts v5.2.61
+// src/lib/__tests__/migrations.test.ts v5.3.0
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearMigrations, registerMigration } from '@/lib/migrations';
 import { readWithMigration, safeGetItem, STORAGE_VERSION } from '@/lib/storage';

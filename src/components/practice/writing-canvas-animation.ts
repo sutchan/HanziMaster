@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-animation.ts v5.2.61
+// src/components/practice/writing-canvas-animation.ts v5.3.0
 // 书写引导动画：沿当前笔画中位线逐帧描线，已完成的笔画以浅色填充字形呈现。
 // 抽离自 writing-canvas.tsx，使组件文件 ≤200 行（单一职责：动画播放）。
 // OPT-04：路径/颜色/尺寸在准备阶段缓存，帧内只读取缓存。

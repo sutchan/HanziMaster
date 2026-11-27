@@ -1,4 +1,4 @@
-// src/hooks/__tests__/useSyncedStorage.test.tsx v5.2.61
+// src/hooks/__tests__/useSyncedStorage.test.tsx v5.3.0
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { PROGRESS_IMPORTED_EVENT } from '@/hooks/use-progress';

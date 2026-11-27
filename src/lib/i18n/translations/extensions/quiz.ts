@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/quiz.ts v5.2.61
+// src/lib/i18n/translations/extensions/quiz.ts v5.3.0
 // 测验纠错提示（11 语言）：答后揭示正确答案，避免题面泄题。
 // 扩展数据已按 locale 拆分；本文件保留全语言聚合视图，供服务端与测试使用。
 import { extensions as en } from './by-locale/en';

@@ -1,4 +1,4 @@
-// src/lib/cloud-sync-server.ts v5.2.61
+// src/lib/cloud-sync-server.ts v5.3.0
 // 云同步服务端逻辑：仅服务端引入 @vercel/blob；限流 + 读写备份，与路由层分离便于单测。
 import { get, put } from '@vercel/blob';
 import { parseProgressBackup, createProgressBackup } from '@/lib/progress-transfer';

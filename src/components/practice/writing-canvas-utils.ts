@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-utils.ts v5.2.61
+// src/components/practice/writing-canvas-utils.ts v5.3.0
 // 书写画布的绘制工具函数集：设计 token 读取、坐标变换、淡字底图与中位线绘制。
 // 描红贴合度判定见 writing-canvas-scoring.ts（单一职责拆分，保证单文件 ≤200 行）。
 

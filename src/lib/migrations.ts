@@ -1,4 +1,4 @@
-// src/lib/migrations.ts v5.2.61
+// src/lib/migrations.ts v5.3.0
 // 版本化 localStorage 数据的迁移注册表：按 from → to 逐级升级，失败时保留原始数据。
 
 export interface StorageEnvelope<T = unknown> {

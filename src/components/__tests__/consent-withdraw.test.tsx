@@ -1,4 +1,4 @@
-// src/components/__tests__/consent-withdraw.test.tsx v5.2.61
+// src/components/__tests__/consent-withdraw.test.tsx v5.3.0
 // OPT-17：同意撤回后 GA 脚本卸载，后续路由切换不再向 dataLayer 推送任何指令/event。
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

@@ -1,4 +1,4 @@
-// src/lib/i18n/index.ts v5.2.61
+// src/lib/i18n/index.ts v5.3.0
 // 全语言静态词典：仅用于服务端与测试；客户端经 load-translations.ts 按 locale 动态加载。
 import { en } from './translations/en';
 import { zhCN } from './translations/zh-CN';

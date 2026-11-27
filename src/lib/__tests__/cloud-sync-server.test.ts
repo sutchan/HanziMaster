@@ -1,4 +1,4 @@
-// src/lib/__tests__/cloud-sync-server.test.ts v5.2.61
+// src/lib/__tests__/cloud-sync-server.test.ts v5.3.0
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockGet, mockPut } = vi.hoisted(() => ({ mockGet: vi.fn(), mockPut: vi.fn() }));

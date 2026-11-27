@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/by-locale/types.ts v5.2.61
+// src/lib/i18n/translations/extensions/by-locale/types.ts v5.3.0
 // 单语言扩展片段的聚合类型：仅 type import，不引入任何运行时语言数据。
 import type { A11yTexts } from '../a11y';
 import type { CloudTexts } from '../cloud';

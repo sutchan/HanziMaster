@@ -1,6 +1,6 @@
 {
-  "name": "HanziMaster 汉字大师 v5.2.61",
-  "version": "5.2.61",
+  "name": "HanziMaster 汉字大师 v5.3.0",
+  "version": "5.3.0",
   "description": "v5.2.61: 修复 Vercel 部署警告——engines.node 由范围 >=24.11.0 改为精确 24.11.0，与 .nvmrc / CI / EdgeOne 一致；README×2 徽章与全部文档版本声明同步。",
   "keywords": [
     "Chinese characters",

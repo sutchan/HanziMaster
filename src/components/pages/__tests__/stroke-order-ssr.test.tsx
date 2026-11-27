@@ -1,4 +1,4 @@
-// src/components/pages/__tests__/stroke-order-ssr.test.tsx v5.2.61
+// src/components/pages/__tests__/stroke-order-ssr.test.tsx v5.3.0
 // OPT-15：SSR 首帧断言——字形路径静态直出，动画组件不在首屏 HTML 中。
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';

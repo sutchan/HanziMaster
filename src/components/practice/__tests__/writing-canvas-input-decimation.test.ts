@@ -1,4 +1,4 @@
-// src/components/practice/__tests__/writing-canvas-input-decimation.test.ts v5.2.61
+// src/components/practice/__tests__/writing-canvas-input-decimation.test.ts v5.3.0
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pointerDown, pointerMove, type WritingInputCtx } from '../writing-canvas-input';

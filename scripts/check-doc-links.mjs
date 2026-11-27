@@ -1,4 +1,4 @@
-// scripts/check-doc-links.mjs v5.2.61
+// scripts/check-doc-links.mjs v5.3.0
 // DOC-03：校验 docs/ 与根 README 的 Markdown 相对链接和图片路径。
 // 跳过 http(s)、mailto、tel、协议相对 URL 与纯锚点；结果写 reports/doc-links.txt。
 

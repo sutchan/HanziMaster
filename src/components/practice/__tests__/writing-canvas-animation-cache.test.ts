@@ -1,4 +1,4 @@
-// src/components/practice/__tests__/writing-canvas-animation-cache.test.ts v5.2.61
+// src/components/practice/__tests__/writing-canvas-animation-cache.test.ts v5.3.0
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createAnimationPaintCache,

@@ -1,4 +1,4 @@
-// src/components/settings-dialog.tsx v5.2.61
+// src/components/settings-dialog.tsx v5.3.0
 'use client';
 
 import { useEffect, useState } from 'react';

@@ -1,4 +1,4 @@
-// src/lib/locale-utils.ts v5.2.61
+// src/lib/locale-utils.ts v5.3.0
 // 语言解析与文档同步工具：从 locale-provider 拆出，保持 Provider 仅负责状态编排。
 import type { Locale } from '@/lib/i18n';
 import { DEFAULT_LOCALE, isRtlLocale, isSupportedLocale } from '@/lib/site';

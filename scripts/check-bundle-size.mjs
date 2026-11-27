@@ -1,4 +1,4 @@
-// scripts/check-bundle-size.mjs v5.2.61
+// scripts/check-bundle-size.mjs v5.3.0
 // 体积预算门禁：在 pnpm build 之后运行，读取 .next/static/chunks 的实际产物。
 // 阈值可用 MAX_BUNDLE_KB / MAX_CHUNK_KB / MAX_FIRST_LOAD_KB / MAX_FONT_KB 覆盖。
 // 首屏 chunk 仅在 app-build-manifest.json / build-manifest.json 真实存在时判定，否则明确跳过。

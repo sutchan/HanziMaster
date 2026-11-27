@@ -1,6 +1,6 @@
 # FAQ 与故障排除指南
 
-> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.3.0（与项目版本同步，权威版本见 `package.json`）
 
 本文按「用户问题 → 开发/本机问题 → 部署/线上问题」分栏，并提供**按症状检索**的速查表。背景见 [08-user-guide.md](08-user-guide.md)、[03-development.md](03-development.md)、[05-deployment.md](05-deployment.md)，未解决项见 [tasks.md](tasks.md)。
 
@@ -45,7 +45,7 @@
 
 **Q：点「显示笔顺」没反应？**
 
-学习页的笔顺演示在 chunk 加载失败时显示重试按钮；请点击重试或刷新。书写弹窗历史版本为静默空态（OPT-14），刷新弹窗后重试。
+学习页的笔顺演示与书写弹窗在 chunk 加载失败时都会显示重试按钮；点击重试即可重新加载（OPT-14 已完成）。
 
 **Q：书写评分怎么算？**
 
@@ -53,7 +53,7 @@
 
 **Q：可以用手指或触控笔吗？**
 
-可以。Canvas 支持鼠标、触控与触控笔；120 Hz 触控笔采样较多（OPT-05）。
+可以。Canvas 支持鼠标、触控与触控笔；高频采样会按最小间距抽稀，评分路径已复用单例画布（OPT-05 已完成）。
 
 ### 1.4 发音
 
@@ -83,7 +83,7 @@
 
 **Q：同步是自动的吗？**
 
-不是，全部手动。修改后需再次上传；自动同步与冲突解决见 OPT-08。
+不是，全部手动。修改后需再次上传；设置、主题、语言与同步码已支持跨标签同步（OPT-08 已完成），自动同步与冲突解决仍未提供。
 
 ## 2. 开发 / 本机问题
 
@@ -99,7 +99,7 @@
 
 ### 2.2 构建与字体
 
-生产构建通过 `next/font/google` 下载字体；受限网络下会超时报 `Connection timed out when requesting https://fonts.gstatic.com/...`。这是**环境限制**，非代码缺陷：换可用网络、用 `NEXT_DIST_DIR` 复用字体缓存，或交由 CI 构建。字体子集与中文渲染错配见 OPT-01。
+生产构建仍通过 `next/font/google` 下载拉丁展示字体；受限网络下可能超时报 `Connection timed out when requesting https://fonts.gstatic.com/...`。这是环境限制，可换网络或交由 CI 构建。中文字体已改为系统衬线栈并移除无效 latin 子集预载（OPT-01 已完成），不再因汉字回退影响渲染。
 
 ### 2.3 IDE 安全护栏
 
@@ -107,7 +107,7 @@
 
 ### 2.4 测试
 
-`pnpm test` / `pnpm test --coverage`；阈值与命令见 [06-testing.md](06-testing.md)。e2e 依赖已装但未接入 CI（OPT-09）。
+`pnpm test` / `pnpm test --coverage`；阈值与命令见 [06-testing.md](06-testing.md)。E2E 配置、用例与 CI job 已接入（OPT-09），CI 实跑结果待验证。
 
 ## 3. 部署 / 线上问题
 
@@ -149,7 +149,7 @@ curl -sSI https://<正式域名>/ | grep -iE 'content-security-policy|x-frame-op
 
 ## 4. 仍未解决的已知问题
 
-见 [10-optimization-roadmap.md](10-optimization-roadmap.md) 与 [tasks.md](tasks.md)：P0-32 线上复验、P2-21 母语者审校、OPT-01/02/03/09 等。
+见 [10-optimization-roadmap.md](10-optimization-roadmap.md) 与 [tasks.md](tasks.md)：P0-32 线上复验、P2-21 母语者审校、OPT-03 分布式限流、OPT-09 E2E CI 实跑、OPT-15 性能基线等。
 
 ## 5. 相关文档
 

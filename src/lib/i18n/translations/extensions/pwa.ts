@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/pwa.ts v5.2.61
+// src/lib/i18n/translations/extensions/pwa.ts v5.3.0
 // P2-14：PWA 安装引导与离线页文案（11 语言齐全）。
 // 扩展数据已按 locale 拆分；本文件保留全语言聚合视图，供服务端与测试使用。
 import { extensions as en } from './by-locale/en';

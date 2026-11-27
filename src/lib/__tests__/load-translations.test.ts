@@ -1,4 +1,4 @@
-// src/lib/__tests__/load-translations.test.ts v5.2.61
+// src/lib/__tests__/load-translations.test.ts v5.3.0
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { locales, translations, type Locale } from '@/lib/i18n';
 import { baseLoaders, extensionLoaders, loadTranslations } from '@/lib/i18n/load-translations';

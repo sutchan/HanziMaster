@@ -1,4 +1,4 @@
-// scripts/i18n-lint.mjs v5.2.52
+// scripts/i18n-lint.mjs v5.3.0
 // 校验 11 语言包、扩展模块与站点语言常量的键/清单一致性，
 // 并检查占位符集合一致性与超长文案（P3-2）。
 // 叶子键一致性由单测 src/lib/__tests__/i18n.test.ts 与 site.test.ts 负责。

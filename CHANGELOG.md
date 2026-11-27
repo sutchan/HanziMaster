@@ -1,5 +1,36 @@
 ﻿# Changelog
 
+## [5.3.0] - 完成可本地闭环的优化与文档任务并迁移任务台账
+
+### Added
+
+- **i18n 按需加载**：新增 `src/lib/i18n/translations/extensions/by-locale/` 11 个按语言入口，`loadTranslations()` 仅请求当前 locale 的扩展词典，类型来源不变（OPT-02）。
+- **存储迁移与跨标签同步**：新增 `src/lib/migrations.ts`（`from/to/transform` 链、环检测、失败保留原值）与 `src/hooks/useSyncedStorage.ts`（设置/主题/语言/同步码统一订阅）；设置面板与数据分区已接入（OPT-07/08）。
+- **书写性能缓存**：新增 `writing-canvas-animation-cache.ts`（Path2D/颜色/尺寸缓存与主题失效）与 `writing-canvas-projection.ts`（一次扫描同时得到距离与弧长）；评分复用单例离屏 canvas，指针输入加最小间距抽稀（OPT-04/05）。
+- **异步资源与重试**：新增 `useAsyncResource()` 统一 `{data, loading, error, retry}`；书写弹窗加载中显示骨架、失败复用 `ErrorState` 并可重试（OPT-14）。
+- **云同步健壮性**：新增 `RateLimiter` 接口与 `InMemoryRateLimiter`（TTL sweep / 上限淘汰 / 并发语义）及 `setRateLimiter()` 注入点；新增 `api-errors.ts` 单一错误码源；`copyWithFallback()` 在剪贴板失败时选中文本并提示，确认弹窗由 Radix Dialog 受控实现（OPT-03/10/12）。
+- **质量门禁**：新增 `playwright.config.ts`、`e2e/a11y.spec.ts`、`test:e2e`、CI e2e job；新增 `docs:links` 与 `openapi:lint` 脚本及 CI 步骤；体积门禁新增 `MAX_FIRST_LOAD_KB` / `MAX_FONT_KB` 与无产物 SKIP 分支（OPT-09/11、DOC-01/03）。
+- **文档**：新增 `docs/redocly.yaml`；刷新 `docs/assets/screenshots/` 4 张 1280×720 截图（DOC-02）。
+
+### Changed
+
+- **Provider 拆分**：`locale-provider.tsx` 拆为 `LocaleStateContext` + `TranslationContext`，`t` 经 `useStableEvent` 保持引用恒定；公开 API 不变（OPT-06）。
+- **RTL 一致性**：Toast 退场动画按元素 `direction` 切方向；设置面板与学习页方向键按 `getComputedStyle(el).direction` 换算步进（OPT-13）。
+- **首页首帧**：`home-page.tsx` 改为内联笔顺数据的静态首帧 SVG，动画组件仅在点击播放后动态加载（OPT-15）。
+- **字体策略**：移除 `Noto_Serif_SC` 的 latin 四字重预载，中文衬线改用系统栈，消除汉字回退与首屏无效字体下载（OPT-01）。
+- **文档台账**：`docs/tasks.md` 只保留 5 项未完成任务；18 项完成项与旧历史快照完整迁移至 `docs/tasks-done.md`，两文档格式与计数统一。
+
+### Fixed
+
+- `/zh-CN` 等语言前缀 rewrite 再次命中 proxy 时 302 自环：已注入请求头时直接放行。
+- 合法空字符串译文被 `|| key` 误判为缺键，页面渲染 `home.heroSuffix`：改为直接使用 `getNestedValue()` 的返回值。
+- GA4 同意撤回新增单测断言撤回后无新增 `dataLayer` event；测验重进改为显式 reducer 并清理定时器（OPT-16/17/18 重复登记补齐）。
+
+### Docs
+
+- `docs/tasks.md` / `docs/tasks-done.md` 同步至 v5.3.0，新增 2026-11-27 复核记录与历史迁移附录。
+- `docs/10-optimization-roadmap.md`、`docs/01-overview.md`、`docs/04-api-reference.md`、`docs/09-faq-troubleshooting.md`、`docs/openapi.yaml` 中已完成项的状态与指向同步更新。
+
 ## [5.2.61] - 修复 Vercel Node 版本自动升级警告
 ### Fix
 - `package.json` `engines.node` 由 `>=24.11.0` 改为精确 `24.11.0`，消除 Vercel 构建警告「will automatically upgrade when a new major Node.js Version is released」；与 `.nvmrc`、`ci.yml` / `deploy.yml` 的 `node-version: 24.11.0`、`edgeone.json` 的 `nodeVersion: 24.11.0` 全链路一致。

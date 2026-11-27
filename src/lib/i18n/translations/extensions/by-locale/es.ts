@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/by-locale/es.ts v5.2.61
+// src/lib/i18n/translations/extensions/by-locale/es.ts v5.3.0
 // 单个语言的全部扩展片段；loadTranslations 只动态导入当前语言，避免全量扩展入主包。
 import type { LocaleExtensions } from './types';
 

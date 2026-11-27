@@ -1,4 +1,4 @@
-// src/components/__tests__/rtl-direction.test.tsx v5.2.61
+// src/components/__tests__/rtl-direction.test.tsx v5.3.0
 // OPT-13：RTL 下方向键步进与 toast 退场方向随 computed direction 翻转。
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

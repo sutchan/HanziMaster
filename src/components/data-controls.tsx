@@ -1,4 +1,4 @@
-// src/components/data-controls.tsx v5.2.61
+// src/components/data-controls.tsx v5.3.0
 'use client';
 
 import { useEffect, useRef, useState } from 'react';

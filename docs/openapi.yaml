@@ -1,5 +1,5 @@
 openapi: 3.1.0
-# docs/openapi.yaml v5.2.61
+# docs/openapi.yaml v5.3.0
 # HanziMaster HTTP API 的机器可读规范（唯一权威源；04-api-reference.md §10 为文字镜像）
 info:
   title: HanziMaster HTTP API
@@ -220,8 +220,8 @@ components:
     ErrorCode:
       type: string
       description: |
-        统一错误码。`not_configured` / `invalid_json` / `use_post` 由路由层返回，暂无专用 message 映射，
-        走 fallback `Cloud sync request failed`（已知缺口，见 docs/10-optimization-roadmap.md OPT-12）。
+        统一错误码。所有码均由 `src/lib/api-errors.ts` 单一来源维护 status、i18n 映射键与英文兜底文案，
+        包括 `not_configured` / `invalid_json` / `use_post`（OPT-12 已完成并归档）。
       enum:
         - not_configured
         - invalid_json

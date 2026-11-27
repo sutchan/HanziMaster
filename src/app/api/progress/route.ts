@@ -1,4 +1,4 @@
-// src/app/api/progress/route.ts v5.2.61
+// src/app/api/progress/route.ts v5.3.0
 // 云同步端点：同步码仅经 POST 请求体传递（不进 URL/日志）；强制动态 + 限流 + 严格校验。
 import { NextResponse, type NextRequest } from 'next/server';
 import { isSyncCode } from '@/lib/cloud-sync';

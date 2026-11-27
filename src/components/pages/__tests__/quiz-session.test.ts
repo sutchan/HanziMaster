@@ -1,4 +1,4 @@
-// src/components/pages/__tests__/quiz-session.test.ts v5.2.61
+// src/components/pages/__tests__/quiz-session.test.ts v5.3.0
 // OPT-18：测验显式 reducer 的重进复位语义（学习页 / 练习页）。
 import { describe, expect, it } from 'vitest';
 import {

@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-scoring.ts v5.2.61
+// src/components/practice/writing-canvas-scoring.ts v5.3.0
 // 描红贴合度判定：指针轨迹 / 键盘笔画序列共用同一评分管线（单一职责拆分自 writing-canvas-utils.ts）。
 // OPT-05：复用单例离屏 canvas；贴合度与方向覆盖共用一次中位线扫描。
 

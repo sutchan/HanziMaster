@@ -1,4 +1,4 @@
-// src/components/locale-contexts.ts v5.2.61
+// src/components/locale-contexts.ts v5.3.0
 'use client';
 
 import { createContext, useContext } from 'react';

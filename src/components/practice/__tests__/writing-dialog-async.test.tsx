@@ -1,5 +1,5 @@
-// src/components/practice/__tests__/writing-dialog-async.test.tsx v5.2.61
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+// src/components/practice/__tests__/writing-dialog-async.test.tsx v5.3.0
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { LocaleProvider } from '@/components/locale-provider';
 import type { CharacterQuiz } from '../practice-assets';
@@ -30,6 +30,10 @@ beforeAll(() => {
       configurable: true,
     });
   }
+});
+
+beforeEach(() => {
+  loadMock.mockReset();
 });
 
 const renderDialog = () =>

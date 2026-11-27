@@ -1,4 +1,4 @@
-// src/lib/cloud-sync-client.ts v5.2.61
+// src/lib/cloud-sync-client.ts v5.3.0
 // 客户端云同步工具：复制回退与错误码解析；不引入服务端依赖，不使用 any。
 import { isSyncErrorCode, type SyncErrorCode } from '@/lib/api-errors';
 

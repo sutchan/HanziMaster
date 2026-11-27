@@ -1,6 +1,6 @@
 ﻿# 项目概述
 
-> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.3.0（与项目版本同步，权威版本见 `package.json`）
 
 ## 1. 基本信息
 
@@ -30,9 +30,9 @@ HanziMaster 以「练习写汉字」为产品主线（v5.2.60 定位对齐），
 | 本地优先 | 学习明细上传量 | 0；只有用户主动上传的加密备份经 `/api/progress` 写入私有 Blob |
 | 多语言可达 | 界面语言数 | 11 种（含 `ar` RTL），`pnpm i18n:lint` 校验键集合一致 |
 | 内容覆盖 | 可学汉字数 | 12 个基础字，笔顺 SVG 数据约 12 KB |
-| 首屏性能 | 首屏 JS / 字体预算 | 待 OPT-01/11 建立预算门禁（当前仅总量 1500 KB / 单块 500 KB） |
+| 首屏性能 | 首屏 JS / 字体预算 | 已建立首屏/懒加载与字体预算门禁（`MAX_FIRST_LOAD_KB` / `MAX_FONT_KB`，OPT-01/11） |
 | 代码质量 | 单文件行数 | ≤200 行（`pnpm check:lines`）；`tsc` 0 error、`eslint` 0/0 |
-| 测试覆盖 | 单测规模 | 36 文件 / 197 用例（v5.2.61 实测） |
+| 测试覆盖 | 单测规模 | 62 文件 / 298 用例（v5.3.0 实测，见 `docs/tasks.md` §1 的运行器说明） |
 | 线上可信度 | SEO / i18n 线上判据 | canonical / sitemap 无 `localhost`，`/zh-CN` 首屏 `lang="zh-CN"`（P0-32 待外部复验） |
 
 技术栈选型理由与架构分层见 [02-architecture.md](02-architecture.md)；部署形态与环境变量见 [05-deployment.md](05-deployment.md)。

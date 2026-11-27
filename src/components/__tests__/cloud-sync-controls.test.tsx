@@ -1,4 +1,4 @@
-// src/components/__tests__/cloud-sync-controls.test.tsx v5.2.61
+// src/components/__tests__/cloud-sync-controls.test.tsx v5.3.0
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-// src/components/cloud-sync-controls.tsx v5.2.61
+// src/components/cloud-sync-controls.tsx v5.3.0
 // 云同步入口：同步码生成/复制、上传与恢复；localStorage 仍是主存储，云端失败不影响本地进度。
 'use client';
 

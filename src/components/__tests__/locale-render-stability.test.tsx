@@ -1,4 +1,4 @@
-// src/components/__tests__/locale-render-stability.test.tsx v5.2.61
+// src/components/__tests__/locale-render-stability.test.tsx v5.3.0
 // OPT-06：语言状态与翻译通道分离；词典到达只重渲染翻译订阅者，t 引用保持稳定。
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +9,8 @@ import { LocaleProvider, useLocale, useLocaleState, useTranslation } from '../lo
 
 vi.mock('@/lib/i18n/load-translations', async () => {
   const { translations: all } = await import('@/lib/i18n');
-  return { loadTranslations: vi.fn(() => Promise.resolve(all.ja)) };
+  // 按 locale 返回对应词典，避免测试空字符串译文时被固定 ja 覆盖。
+  return { loadTranslations: vi.fn((locale: keyof typeof all) => Promise.resolve(all[locale] ?? all.en)) };
 });
 
 const stateRenders: number[] = [];
@@ -78,13 +79,14 @@ describe('OPT-06 上下文拆分', () => {
     expect(latestT!('legal.privacyTitle')).toBe(translations.ja.legal.privacyTitle);
   });
 
-  it('合法空字符串译文保持为空，不回退显示键名', () => {
+  it('合法空字符串译文保持为空，不回退显示键名', async () => {
     render(
       <LocaleProvider defaultLocale="zh-CN">
         <EmptyTranslationProbe />
       </LocaleProvider>,
     );
-    expect(screen.getByTestId('empty-translation')).toBeEmptyDOMElement();
+    // 初始词典为英文兜底，等待目标 locale 异步到达后再断言。
+    await waitFor(() => expect(screen.getByTestId('empty-translation')).toBeEmptyDOMElement());
   });
 
   it('useLocale / useTranslation 公开 API 形状保持不变', () => {

@@ -1,4 +1,4 @@
-# docs/redocly.yaml v5.2.61
+# docs/redocly.yaml v5.3.0
 # OpenAPI 机器校验配置：沿用 recommended 规则集，仅关闭与本项目设计相符的 4 条规则。
 extends:
   - recommended

@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/index.ts v5.2.61
+// src/lib/i18n/translations/extensions/index.ts v5.3.0
 // 扩展合并逻辑：只接收已加载的单语言片段，避免静态导入全部语言扩展（OPT-02）。
 import type { LocaleExtensions } from './by-locale/types';
 import { extensions as enExtensions } from './by-locale/en';

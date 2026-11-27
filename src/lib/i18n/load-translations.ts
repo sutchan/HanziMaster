@@ -1,4 +1,4 @@
-// src/lib/i18n/load-translations.ts v5.2.61
+// src/lib/i18n/load-translations.ts v5.3.0
 // P1-11 / OPT-02：基础词典与扩展片段都按 locale 动态 import，只请求当前语言。
 import type { Locale, Translations } from '@/lib/i18n';
 import type { LocaleExtensions } from './translations/extensions/by-locale/types';

@@ -1,4 +1,4 @@
-// src/lib/__tests__/api-errors.test.ts v5.2.61
+// src/lib/__tests__/api-errors.test.ts v5.3.0
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SYNC_ERROR_CODES, SYNC_ERRORS, isSyncErrorCode } from '@/lib/api-errors';

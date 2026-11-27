@@ -1,4 +1,4 @@
-// src/proxy.ts v5.2.57
+// src/proxy.ts v5.3.0
 // P1-7：URL 级 i18n。Next.js 16 的中间件文件约定为 proxy.ts（middleware.ts 已弃用并告警），
 // /{locale}/... 前缀由本文件重写到既有页面 + ?lang=，因此无需复制多套页面，
 // 且 /、/learn、/practice 等旧深链保持可用；首访按 Accept-Language 协商重定向到语言前缀。

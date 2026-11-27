@@ -1,4 +1,4 @@
-// src/proxy.test.ts v5.2.49
+// src/proxy.test.ts v5.3.0
 // P1-7/8/9：固化 URL 级 i18n 中间件（Next 16 proxy.ts）行为——语言前缀重写、
 // 无前缀首访协商重定向、?lang=/cookie/Accept-Language 优先级与 cookie 注入。
 import { describe, expect, it } from 'vitest';

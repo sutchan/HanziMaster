@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/progress.ts v5.2.61
+// src/lib/i18n/translations/extensions/progress.ts v5.3.0
 // 进度导出/导入入口与持久化失败提示文案（11 语言齐全）。
 // 扩展数据已按 locale 拆分；本文件保留全语言聚合视图，供服务端与测试使用。
 import { extensions as en } from './by-locale/en';

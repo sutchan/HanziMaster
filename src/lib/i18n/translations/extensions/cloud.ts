@@ -1,4 +1,4 @@
-// src/lib/i18n/translations/extensions/cloud.ts v5.2.61
+// src/lib/i18n/translations/extensions/cloud.ts v5.3.0
 // 云同步文案（11 语言齐全），独立扩展模块避免语言基准包超过 200 行。
 // prettier-ignore
 // 扩展数据已按 locale 拆分；本文件保留全语言聚合视图，供服务端与测试使用。

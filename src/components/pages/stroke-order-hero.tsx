@@ -1,4 +1,4 @@
-// src/components/pages/stroke-order-hero.tsx v5.2.61
+// src/components/pages/stroke-order-hero.tsx v5.3.0
 // OPT-15：首帧由 RSC 静态 SVG 直出；动画逻辑只在用户点击播放后动态加载。
 'use client';
 

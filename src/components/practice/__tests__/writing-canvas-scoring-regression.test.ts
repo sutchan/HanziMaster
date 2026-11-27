@@ -1,4 +1,4 @@
-// src/components/practice/__tests__/writing-canvas-scoring-regression.test.ts v5.2.61
+// src/components/practice/__tests__/writing-canvas-scoring-regression.test.ts v5.3.0
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { scale, scaleY } from '../writing-canvas-utils';
 import { judgeUserStroke, scoreStroke } from '../writing-canvas-scoring';

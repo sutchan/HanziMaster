@@ -1,4 +1,4 @@
-// src/hooks/use-learn-quiz-session.ts v5.2.61
+// src/hooks/use-learn-quiz-session.ts v5.3.0
 // OPT-18：学习页测验会话 + 自动关闭计时器；所有重进/关闭路径统一清理计时器。
 'use client';
 

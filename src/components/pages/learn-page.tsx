@@ -1,4 +1,4 @@
-// src/components/pages/learn-page.tsx v5.2.61
+// src/components/pages/learn-page.tsx v5.3.0
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';

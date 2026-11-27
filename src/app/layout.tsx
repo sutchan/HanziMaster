@@ -1,4 +1,4 @@
-// src/app/layout.tsx v5.2.61
+// src/app/layout.tsx v5.3.0
 import { cache } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';

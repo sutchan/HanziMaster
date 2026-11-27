@@ -1,4 +1,4 @@
-// src/hooks/__tests__/useAsyncResource.test.tsx v5.2.61
+// src/hooks/__tests__/useAsyncResource.test.tsx v5.3.0
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useAsyncResource } from '../useAsyncResource';

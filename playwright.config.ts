@@ -1,4 +1,4 @@
-// playwright.config.ts v5.2.61
+// playwright.config.ts v5.3.0
 // OPT-09：Playwright 端到端门禁。CI 使用已构建产物（pnpm start），本地默认 pnpm dev。
 // 浏览器不可用时本配置仍完整；CI job 负责安装 chromium。
 

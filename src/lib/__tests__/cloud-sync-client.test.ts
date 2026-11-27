@@ -1,4 +1,4 @@
-// src/lib/__tests__/cloud-sync-client.test.ts v5.2.61
+// src/lib/__tests__/cloud-sync-client.test.ts v5.3.0
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyWithFallback, extractSyncErrorCode } from '../cloud-sync-client';
 

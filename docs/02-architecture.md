@@ -1,6 +1,6 @@
 # 技术架构
 
-> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.3.0（与项目版本同步，权威版本见 `package.json`）
 
 本文描述**当前代码的实际架构**。组件 API 见 [04-api-reference.md](04-api-reference.md)，设计系统见 [07-design-prototype.md](07-design-prototype.md)，编码约束见 [coding-standards.md](coding-standards.md)。
 
@@ -101,7 +101,7 @@
 
 ## 7. 测试与质量
 
-Vitest + jsdom，测试就近放在各模块 `__tests__/`，当前 **36 个单测文件**（197 用例，以实测为准）；`i18n.test.ts` 校验 11 语言叶子键一致。Playwright 与 `@axe-core/playwright` 依赖已安装，但**尚无** `e2e/` 目录与 `test:e2e` 脚本（OPT-09）；覆盖率阈值门禁已配置（`@vitest/coverage-v8`，80/70/80/80）。质量门禁（类型检查 / lint / 单测 / 行数 / 审计 / 构建 / 体积 / i18n / 版本展示位）见 [coding-standards.md](coding-standards.md) §11，测试细节见 [06-testing.md](06-testing.md)；CI 工作流见 [05-deployment.md](05-deployment.md) §6。
+Vitest + jsdom，测试就近放在各模块 `__tests__/`，当前 **62 个单测文件**（298 用例，以实测为准）；`i18n.test.ts` 校验 11 语言叶子键一致。Playwright 与 `@axe-core/playwright` 已接入 `playwright.config.ts`、`e2e/` 与 `test:e2e` 脚本（OPT-09 配置完成，CI 实跑待验证）；覆盖率阈值门禁已配置（`@vitest/coverage-v8`，80/70/80/80）。质量门禁（类型检查 / lint / 单测 / 行数 / 审计 / 构建 / 体积 / i18n / 版本展示位）见 [coding-standards.md](coding-standards.md) §11，测试细节见 [06-testing.md](06-testing.md)；CI 工作流见 [05-deployment.md](05-deployment.md) §6。
 
 ## 8. 技术选型理由
 

@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-animation-cache.ts v5.2.61
+// src/components/practice/writing-canvas-animation-cache.ts v5.3.0
 // 书写引导动画的帧缓存：准备阶段一次性解析 Path2D、读取颜色 token 与画布尺寸；主题变化后自动失效重建。
 
 import {

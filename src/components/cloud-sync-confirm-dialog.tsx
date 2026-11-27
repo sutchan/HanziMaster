@@ -1,4 +1,4 @@
-// src/components/cloud-sync-confirm-dialog.tsx v5.2.61
+// src/components/cloud-sync-confirm-dialog.tsx v5.3.0
 // 受控确认弹窗：用现有 Radix Dialog 组合出 alertdialog 语义，替换 window.confirm（不新增依赖）。
 'use client';
 

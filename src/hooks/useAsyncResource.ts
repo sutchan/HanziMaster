@@ -1,4 +1,4 @@
-// src/hooks/useAsyncResource.ts v5.2.61
+// src/hooks/useAsyncResource.ts v5.3.0
 // 统一异步资源状态：{data, loading, error, retry}。按 key 重新加载，支持失败后手动重试与过期结果丢弃。
 
 'use client';

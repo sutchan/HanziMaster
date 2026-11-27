@@ -1,4 +1,4 @@
-// src/lib/storage.ts v5.2.61
+// src/lib/storage.ts v5.3.0
 // Secure localStorage utilities with version control + 链式迁移（OPT-07）
 import { migrateEnvelope, type StorageEnvelope } from './migrations';
 

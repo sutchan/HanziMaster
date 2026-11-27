@@ -1,4 +1,4 @@
-// src/lib/direction.ts v5.2.61
+// src/lib/direction.ts v5.3.0
 // OPT-13：方向键与退场动画的方向统一从元素实际 computed direction 推导，禁止硬编码 ±1。
 
 /** 返回逻辑前进方向：LTR 为 +1，RTL 为 -1（视觉右/左随阅读方向翻转）。 */

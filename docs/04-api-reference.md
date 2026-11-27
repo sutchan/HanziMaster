@@ -1,6 +1,6 @@
 # API 参考
 
-> 文档版本：v5.2.61（与项目版本同步，权威版本见 `package.json`）
+> 文档版本：v5.3.0（与项目版本同步，权威版本见 `package.json`）
 
 本文列出应用内部**公开模块与组件的真实签名**。类型与导出以源码为准；本文只做稳定契约说明，不逐字复制实现。设计 token 完整色板见 [07-design-prototype.md](07-design-prototype.md)，编码用法见 [coding-standards.md](coding-standards.md)。
 
@@ -198,7 +198,7 @@ export function Example() {
 | 503 | `not_configured` | 未配置 Blob 凭证 | 降级为纯本地进度，不提示为用户错误 |
 | 405 | `use_post` | 使用了旧 GET 通道 | 改用 POST |
 
-> `not_configured` / `invalid_json` / `use_post` 尚无专用 `message` 映射，走 fallback `Cloud sync request failed`；见 [10-optimization-roadmap.md](10-optimization-roadmap.md) OPT-12。
+> 所有错误码的英文兜底文案与 i18n 映射键由 `src/lib/api-errors.ts` 单一来源维护；`not_configured` / `invalid_json` / `use_post` 已有专用映射，详见 [10-optimization-roadmap.md](10-optimization-roadmap.md) OPT-12（已完成并归档）。
 
 ### 10.2 调用示例
 

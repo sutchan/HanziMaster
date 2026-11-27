@@ -1,4 +1,4 @@
-// src/components/practice/writing-canvas-projection.ts v5.2.61
+// src/components/practice/writing-canvas-projection.ts v5.3.0
 // 中位线投影扫描：一次遍历同时得到「到折线最短距离」与「沿折线累计弧长」，
 // 供贴合度命中判定与方向覆盖判定共用，避免同一批点对折线做多轮投影。
 
