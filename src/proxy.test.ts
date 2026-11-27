@@ -29,6 +29,16 @@ describe('proxy · URL 级 i18n', () => {
     expect(res.cookies.get('hanzi-master-locale')?.value).toBe('zh-CN');
   });
 
+  it('rewrite 后再次命中 proxy 时直接放行，避免语言前缀 302 自环', () => {
+    const res = proxy(
+      makeReq('/learn', {
+        headers: { 'x-hanzi-locale': 'zh-CN', 'x-hanzi-path': '/zh-CN/learn' },
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('location')).toBeNull();
+  });
+
   it('无前缀首访 / 按默认语言 302 重定向到语言前缀', () => {
     const res = proxy(makeReq('/'));
     expect(res.status).toBe(302);

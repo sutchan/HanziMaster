@@ -34,6 +34,11 @@ function TranslationProbe() {
   return <span data-testid="translated">{t('legal.privacyTitle')}</span>;
 }
 
+function EmptyTranslationProbe() {
+  const { t } = useTranslation();
+  return <span data-testid="empty-translation">{t('home.heroSuffix')}</span>;
+}
+
 function ApiShapeProbe() {
   const localeApi = useLocale();
   const { t } = useTranslation();
@@ -71,6 +76,15 @@ describe('OPT-06 上下文拆分', () => {
     expect(translationRenders.length).toBeGreaterThan(1);
     expect(latestT).toBe(tBeforeLoad);
     expect(latestT!('legal.privacyTitle')).toBe(translations.ja.legal.privacyTitle);
+  });
+
+  it('合法空字符串译文保持为空，不回退显示键名', () => {
+    render(
+      <LocaleProvider defaultLocale="zh-CN">
+        <EmptyTranslationProbe />
+      </LocaleProvider>,
+    );
+    expect(screen.getByTestId('empty-translation')).toBeEmptyDOMElement();
   });
 
   it('useLocale / useTranslation 公开 API 形状保持不变', () => {

@@ -22,6 +22,9 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   // 双保险：matcher 未覆盖到的约定路由在运行时再次 bypass（社交图 / 清单 / 静态 / API）
   if (shouldBypassProxy(pathname)) return NextResponse.next();
+  // 兼容 Next 16 rewrite 后 proxy 再次命中：语言前缀分支已注入请求头时直接放行，
+  // 否则无前缀的重写目标会被再次协商并 302 回语言前缀，形成自环。
+  if (request.headers.has(PATH_HEADER) && request.headers.has(LOCALE_HEADER)) return NextResponse.next();
   const segments = pathname.split('/').filter(Boolean);
   const first = segments[0];
 

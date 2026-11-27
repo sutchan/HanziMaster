@@ -98,7 +98,8 @@ export function LocaleProvider({
   // OPT-06：t 引用恒定（useEvent 语义），内部闭包随词典更新，memo 子树不会因词典到达而失效。
   const t = useStableEvent(
     (key: TranslationKey, params?: Record<string, string | number>): string =>
-      interpolate(getNestedValue(dictionary, key) || key, params),
+      // getNestedValue 对缺失键已返回键名；此处不能再把合法空字符串当作缺失。
+      interpolate(getNestedValue(dictionary, key), params),
   );
 
   // 两个 Context 分离：语言状态与翻译通道各自变更，只订阅状态的组件不随词典重渲染。
